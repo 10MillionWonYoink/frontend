@@ -17,7 +17,7 @@ export default function HomePage() {
         </div>
 
         <h1 className="max-w-4xl text-5xl font-bold tracking-tight sm:text-7xl">
-          사진 한 장으로
+          사진 한 장으로s
           <br />
           예측할 수 없는 릴레이를 시작하세요.
         </h1>
