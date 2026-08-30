@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 const scores = [
   ["유사도", 87],
   ["창의성", 72],
-  ["억지 정도", 31]
+  ["억지 정도", 31],
 ] as const;
 
 export default function ResultPage() {
@@ -24,13 +24,11 @@ export default function ResultPage() {
             <span className="font-semibold">판정 성공</span>
           </div>
 
-          <h1 className="mt-5 text-5xl font-bold tracking-tight">
-            먼지와 연결됐어요.
-          </h1>
+          <h1 className="mt-5 text-5xl font-bold tracking-tight">먼지와 연결됐어요.</h1>
 
           <p className="mt-5 max-w-xl leading-7 text-neutral-400">
-            사진에서 먼지와 관련된 특징을 확인했습니다. 이번 결과를 바탕으로
-            다음 주제가 생성됩니다.
+            사진에서 먼지와 관련된 특징을 확인했습니다. 이번 결과를 바탕으로 다음 주제가
+            생성됩니다.
           </p>
 
           <div className="mt-10 grid gap-3 sm:grid-cols-3">

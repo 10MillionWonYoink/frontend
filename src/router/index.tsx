@@ -9,5 +9,5 @@ export const router = createBrowserRouter([
   { path: "/", element: <HomePage /> },
   { path: "/relay", element: <RelayPage /> },
   { path: "/result", element: <ResultPage /> },
-  { path: "*", element: <NotFoundPage /> }
+  { path: "*", element: <NotFoundPage /> },
 ]);

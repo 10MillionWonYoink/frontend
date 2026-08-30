@@ -10,18 +10,13 @@ export async function getRelay(relayId: string): Promise<Relay> {
   return data;
 }
 
-export async function uploadRelayPhoto(
-  relayId: string,
-  file: File
-): Promise<Relay> {
+export async function uploadRelayPhoto(relayId: string, file: File): Promise<Relay> {
   const formData = new FormData();
   formData.append("image", file);
 
-  const { data } = await api.post<Relay>(
-    `/relay/${relayId}/photo`,
-    formData,
-    { headers: { "Content-Type": "multipart/form-data" } }
-  );
+  const { data } = await api.post<Relay>(`/relay/${relayId}/photo`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
 
   return data;
 }

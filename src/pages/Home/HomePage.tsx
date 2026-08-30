@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 const steps = [
   ["01", "사진 촬영", "주어진 주제에 맞는 사진을 제한시간 안에 찍습니다."],
   ["02", "AI 분석", "AI가 사진을 판정하고 유사도와 창의성을 평가합니다."],
-  ["03", "다음 주제", "분석 결과를 바탕으로 예상하지 못한 주제가 이어집니다."]
+  ["03", "다음 주제", "분석 결과를 바탕으로 예상하지 못한 주제가 이어집니다."],
 ];
 
 export default function HomePage() {
@@ -23,9 +23,8 @@ export default function HomePage() {
         </h1>
 
         <p className="mt-7 max-w-2xl text-lg leading-8 text-neutral-400">
-          사진을 AI가 분석하고, 그 결과로 다음 사람이 찍어야 할 주제를
-          만들어냅니다. 강아지에서 먼지, 먼지에서 하수구까지.
-          어디로 이어질지는 아무도 모릅니다.
+          사진을 AI가 분석하고, 그 결과로 다음 사람이 찍어야 할 주제를 만들어냅니다.
+          강아지에서 먼지, 먼지에서 하수구까지. 어디로 이어질지는 아무도 모릅니다.
         </p>
 
         <div className="mt-10">
@@ -47,9 +46,7 @@ export default function HomePage() {
             >
               <span className="text-sm text-neutral-500">{number}</span>
               <h2 className="mt-8 text-xl font-semibold">{title}</h2>
-              <p className="mt-3 text-sm leading-6 text-neutral-400">
-                {description}
-              </p>
+              <p className="mt-3 text-sm leading-6 text-neutral-400">{description}</p>
             </div>
           ))}
         </div>
