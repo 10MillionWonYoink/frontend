@@ -13,7 +13,7 @@ Node.js 22+ 및 pnpm을 권장합니다.
 ```bash
 corepack enable
 pnpm install
-cp .env.example .env
+cp .env .env
 pnpm dev
 ```
 
