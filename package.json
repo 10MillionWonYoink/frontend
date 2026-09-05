@@ -26,6 +26,7 @@
   "devDependencies": {
     "@eslint/js": "^9.34.0",
     "@tailwindcss/vite": "^4.1.12",
+    "@tanstack/react-query-devtools": "^5.102.8",
     "@types/node": "^22.17.2",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
