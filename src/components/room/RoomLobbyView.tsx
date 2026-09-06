@@ -7,6 +7,9 @@ import { PlayerGrid } from "./PlayerGrid";
 import { RoomSettings } from "./RoomSettings";
 
 const COPY_FEEDBACK_DURATION_MS = 1_500;
+const MAX_VISIBLE_INVITATION_CODE_LENGTH = 12;
+const VISIBLE_INVITATION_CODE_PREFIX_LENGTH = 6;
+const VISIBLE_INVITATION_CODE_SUFFIX_LENGTH = 3;
 
 interface RoomLobbyViewProps {
   canStart: boolean;
@@ -30,6 +33,11 @@ export function RoomLobbyView({
   room,
 }: RoomLobbyViewProps) {
   const [isCopied, setIsCopied] = useState(false);
+  const isLongInvitationCode =
+    room.invitationCode.length > MAX_VISIBLE_INVITATION_CODE_LENGTH;
+  const displayInvitationCode = isLongInvitationCode
+    ? `${room.invitationCode.slice(0, VISIBLE_INVITATION_CODE_PREFIX_LENGTH)}...${room.invitationCode.slice(-VISIBLE_INVITATION_CODE_SUFFIX_LENGTH)}`
+    : room.invitationCode;
 
   useEffect(() => {
     if (!isCopied) {
@@ -71,13 +79,17 @@ export function RoomLobbyView({
         <Card className="border-0 bg-gradient-to-br from-[#fff6d8] to-[#ffe4ed]">
           <p className="text-xs font-bold text-[#8b85a8]">초대 코드</p>
           <div className="mt-2 flex items-center justify-between gap-3">
-            <strong className="min-w-0 truncate text-2xl font-black tracking-[0.18em] text-[#6c4cff]">
-              {room.invitationCode}
+            <strong
+              className="whitespace-nowrap font-mono text-lg font-black text-[#6c4cff] sm:text-2xl"
+              title={isLongInvitationCode ? room.invitationCode : undefined}
+              aria-label={room.invitationCode}
+            >
+              {displayInvitationCode}
             </strong>
             <Button
               variant="ghost"
               onClick={() => void handleCopy()}
-              className="min-h-10 px-3 py-2"
+              className="min-h-10 shrink-0 px-3 py-2"
             >
               {isCopied ? (
                 <Check className="size-4" />
