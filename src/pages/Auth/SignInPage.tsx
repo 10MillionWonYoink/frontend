@@ -1,18 +1,10 @@
-export default function SignInPage() {
-  const handleKakaoLogin = () => {
-    window.location.replace(
-      `${import.meta.env.VITE_API_BASE_URL}/api/auth/kakao`,
-    );
-  };
+import { MobileShell } from "../../components/layout/MobileShell";
+import { SignInContainer } from "../../containers/SignInContainer";
 
+export default function SignInPage() {
   return (
-    <main>
-      <button
-        type="button"
-        onClick={handleKakaoLogin}
-      >
-        카카오 로그인
-      </button>
-    </main>
+    <MobileShell>
+      <SignInContainer />
+    </MobileShell>
   );
 }

@@ -1,16 +1,8 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
-
-const baseURL =
-  import.meta.env.VITE_API_BASE_URL;
-
-if (!baseURL) {
-  throw new Error(
-    "VITE_API_URL 환경변수가 없습니다.",
-  );
-}
+import { API_BASE_URL } from "../config/env";
 
 export const api = axios.create({
-  baseURL: `${baseURL}/api`,
+  baseURL: `${API_BASE_URL}/api`,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
@@ -19,33 +11,24 @@ export const api = axios.create({
 });
 
 const refreshApi = axios.create({
-  baseURL: `${baseURL}/api`,
+  baseURL: `${API_BASE_URL}/api`,
   withCredentials: true,
   timeout: 10_000,
 });
 
-interface RetryRequestConfig
-  extends InternalAxiosRequestConfig {
+interface RetryRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
 }
 
-let refreshPromise: Promise<void> | null =
-  null;
+let refreshPromise: Promise<void> | null = null;
 
 api.interceptors.response.use(
   (response) => response,
 
   async (error: AxiosError) => {
-    const originalRequest =
-      error.config as
-        | RetryRequestConfig
-        | undefined;
+    const originalRequest = error.config as RetryRequestConfig | undefined;
 
-    if (
-      !originalRequest ||
-      error.response?.status !== 401 ||
-      originalRequest._retry
-    ) {
+    if (!originalRequest || error.response?.status !== 401 || originalRequest._retry) {
       return Promise.reject(error);
     }
 
@@ -55,7 +38,7 @@ api.interceptors.response.use(
       // 여러 API가 동시에 401이어도 refresh 요청은 한 번만 실행
       if (!refreshPromise) {
         refreshPromise = refreshApi
-          .post('/auth/refresh')
+          .post("/auth/refresh")
           .then(() => undefined)
           .finally(() => {
             refreshPromise = null;
