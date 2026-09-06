@@ -1,5 +1,6 @@
 import type {
   CreateRoomRequest,
+  CreateRoomResponse,
   JoinRoomRequest,
   JoinRoomResponse,
   Room,
@@ -19,8 +20,10 @@ export async function getRoom(roomId: string): Promise<Room> {
   return data;
 }
 
-export async function createRoom(request: CreateRoomRequest): Promise<Room> {
-  const { data } = await api.post<Room>(endpoints.room.create, request);
+export async function createRoom(
+  request: CreateRoomRequest,
+): Promise<CreateRoomResponse> {
+  const { data } = await api.post<CreateRoomResponse>(endpoints.room.create, request);
   return data;
 }
 

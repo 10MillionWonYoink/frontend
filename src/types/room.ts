@@ -31,6 +31,13 @@ export interface CreateRoomRequest {
   totalRounds: number;
 }
 
+export interface CreateRoomResponse {
+  room: {
+    id: number;
+  };
+  members: unknown[];
+}
+
 export interface JoinRoomRequest {
   invitationCode: string;
 }

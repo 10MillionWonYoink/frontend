@@ -25,7 +25,7 @@ export function HomeContainer() {
         turnSeconds: DEFAULT_TURN_SECONDS,
         totalRounds: DEFAULT_TOTAL_ROUNDS,
       },
-      { onSuccess: (room) => navigate(`/rooms/${room.id}`) },
+      { onSuccess: (response) => navigate(`/rooms/${response.room.id}`) },
     );
   };
 
