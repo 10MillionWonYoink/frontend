@@ -1,6 +1,7 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import HomePage from "../pages/Home/HomePage";
-import RelayPage from "../pages/Relay/RelayPage";
+import GamePage from "../pages/Relay/GamePage";
+import RoomPage from "../pages/Relay/RoomPage";
 import ResultPage from "../pages/Result/ResultPage";
 import NotFoundPage from "../pages/NotFound/NotFoundPage";
 import App from "../App.tsx";
@@ -20,8 +21,11 @@ export const router = createBrowserRouter([
         element: <ProtectedRoute />,
         children: [
           { index: true, element: <HomePage /> },
-          { path: "relay", element: <RelayPage /> },
-          { path: "result", element: <ResultPage /> },
+          { path: "relay", element: <Navigate to="/" replace /> },
+          { path: "result", element: <Navigate to="/" replace /> },
+          { path: "rooms/:roomId", element: <RoomPage /> },
+          { path: "rooms/:roomId/game", element: <GamePage /> },
+          { path: "rooms/:roomId/result", element: <ResultPage /> },
         ],
       },
 

@@ -15,3 +15,6 @@ coverage/
 .DS_Store
 
 *.log
+
+# Local migration references are not application source.
+/migration/
