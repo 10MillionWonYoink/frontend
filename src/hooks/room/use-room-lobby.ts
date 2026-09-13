@@ -31,16 +31,22 @@ export function useRoomLobby(roomId: string) {
     mutationFn: socket.changeHost,
     onSettled: refresh,
   });
+  const startGameMutation = useMutation({
+    mutationFn: socket.startGame,
+    onSettled: refresh,
+  });
   const mutationError =
     readyMutation.error ??
     leaveMutation.error ??
     updateMutation.error ??
-    hostMutation.error;
+    hostMutation.error ??
+    startGameMutation.error;
   const isMutating =
     readyMutation.isPending ||
     leaveMutation.isPending ||
     updateMutation.isPending ||
-    hostMutation.isPending;
+    hostMutation.isPending ||
+    startGameMutation.isPending;
   return {
     room,
     currentPlayer,
@@ -56,5 +62,6 @@ export function useRoomLobby(roomId: string) {
     leave: leaveMutation.mutateAsync,
     updateRoom: updateMutation.mutateAsync,
     changeHost: hostMutation.mutateAsync,
+    startGame: startGameMutation.mutate,
   };
 }

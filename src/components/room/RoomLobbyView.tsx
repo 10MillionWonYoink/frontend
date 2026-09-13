@@ -23,6 +23,7 @@ interface RoomLobbyViewProps {
   onReadyChange: (isReady: boolean) => void;
   onUpdateRoom: (changes: Omit<RoomUpdate, "roomId">) => Promise<unknown>;
   onChangeHost: (userId: number) => Promise<unknown>;
+  onStartGame: () => void;
   room: Room;
 }
 
@@ -36,6 +37,7 @@ export function RoomLobbyView({
   onReadyChange,
   onUpdateRoom,
   onChangeHost,
+  onStartGame,
   room,
 }: RoomLobbyViewProps) {
   const { isCopied, copyError, copy } = useCopyToClipboard(room.invitationCode);
@@ -45,6 +47,9 @@ export function RoomLobbyView({
     ? `${room.invitationCode.slice(0, VISIBLE_INVITATION_CODE_PREFIX_LENGTH)}...${room.invitationCode.slice(-VISIBLE_INVITATION_CODE_SUFFIX_LENGTH)}`
     : room.invitationCode;
   const canAct = socketStatus === "open" && room.status === "WAITING" && !isMutating;
+  const everyoneElseReady = room.players
+    .filter((player) => !player.isHost)
+    .every((player) => player.isReady);
   return (
     <>
       <header className="bg-gradient-to-br from-[#6c4cff] to-[#b36bff] px-5 pb-8 pt-[max(1.25rem,env(safe-area-inset-top))] text-white">
@@ -150,13 +155,20 @@ export function RoomLobbyView({
           </Link>
         ) : currentPlayer?.isHost ? (
           <div>
-            <Button fullWidth disabled className="min-h-14 gap-2">
+            <Button
+              fullWidth
+              disabled={!canAct || !everyoneElseReady}
+              onClick={onStartGame}
+              className="min-h-14 gap-2"
+            >
               <Rocket className="size-5" aria-hidden="true" />
-              게임 시작 준비 중
+              {isMutating ? "시작하는 중..." : "게임 시작하기"}
             </Button>
-            <p className="mt-2 text-center text-xs text-[#8b85a8]">
-              아직 게임을 시작할 수 없어요. 참여자 준비 상태는 확인할 수 있어요.
-            </p>
+            {!everyoneElseReady && (
+              <p className="mt-2 text-center text-xs text-[#8b85a8]">
+                모든 참여자가 준비를 완료하면 시작할 수 있어요.
+              </p>
+            )}
           </div>
         ) : (
           <Button

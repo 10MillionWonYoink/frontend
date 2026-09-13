@@ -12,7 +12,7 @@ export function RoomContainer() {
   const { roomId = "" } = useParams();
   const lobby = useRoomLobby(roomId);
   useEffect(() => {
-    if (lobby.room?.status === "PLAYING")
+    if (lobby.room?.status === "PLAYING" || lobby.room?.status === "READY")
       navigate(`/rooms/${roomId}/game`, { replace: true });
     if (lobby.socket.roomClosed) navigate("/", { replace: true });
   }, [lobby.room?.status, lobby.socket.roomClosed, navigate, roomId]);
@@ -58,6 +58,7 @@ export function RoomContainer() {
       onReadyChange={lobby.setReady}
       onUpdateRoom={lobby.updateRoom}
       onChangeHost={lobby.changeHost}
+      onStartGame={lobby.startGame}
     />
   );
 }

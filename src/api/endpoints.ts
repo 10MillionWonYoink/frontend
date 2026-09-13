@@ -13,4 +13,10 @@ export const endpoints = {
     detail: (roomId: string | number) => `/rooms/${encodePathSegment(roomId)}`,
     invite: (roomId: number) => `/rooms/${encodePathSegment(roomId)}/invite`,
   },
+  game: {
+    latestByRoom: (roomId: number) =>
+      `/games/rooms/${encodePathSegment(roomId)}/latest`,
+    detail: (gameId: number) => `/games/${encodePathSegment(gameId)}`,
+    result: (gameId: number) => `/games/${encodePathSegment(gameId)}/result`,
+  },
 } as const;

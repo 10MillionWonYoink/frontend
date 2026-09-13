@@ -9,6 +9,7 @@ import {
 import { refreshSession } from "../../api/client";
 import type {
   Acknowledgement,
+  GameStartedBroadcast,
   HostChangeResult,
   LeaveResult,
   RoomUpdate,
@@ -141,6 +142,9 @@ export function useLobbySocket(roomId: number, enabled: boolean) {
       setRoomClosed(true);
       refreshLists();
     });
+    socket.on("lobby:game-started", (payload) => {
+      if (payload.roomId === roomId) refreshRoom();
+    });
     socket.connect();
     return () => {
       active = false;
@@ -197,6 +201,14 @@ export function useLobbySocket(roomId: number, enabled: boolean) {
     },
     [requireSocket, roomId],
   );
+  const startGame = useCallback(async () => {
+    const socket = requireSocket();
+    return acknowledge(
+      socket,
+      (done: (result: Acknowledgement & GameStartedBroadcast) => void) =>
+        socket.emit("game:start", { roomId }, done),
+    );
+  }, [requireSocket, roomId]);
   const reconnect = useCallback(() => {
     const socket = socketRef.current;
     if (!socket) return;
@@ -213,6 +225,7 @@ export function useLobbySocket(roomId: number, enabled: boolean) {
     leave,
     updateRoom,
     changeHost,
+    startGame,
     reconnect,
   };
 }

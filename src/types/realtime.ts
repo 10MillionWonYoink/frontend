@@ -1,4 +1,5 @@
 import type { BackendRoomStatus } from "./room";
+import type { GameSessionState, GameSessionStatus } from "./game";
 
 export interface LobbyState {
   id: number;
@@ -65,6 +66,61 @@ export interface HostChangeResult {
   previousHostId: number;
   newHostId: number;
 }
+
+export interface GameStartTurn {
+  turnNumber: number;
+  userId: number;
+}
+
+export interface GameStartedBroadcast {
+  roomId: number;
+  gameId: number;
+  status: GameSessionStatus;
+  countdownEndsAt: string;
+  totalTurns: number;
+  timeLimitSeconds: number;
+  turns: GameStartTurn[];
+}
+
+export interface GameTurnStartedEvent {
+  gameId: number;
+  roomId: number;
+  turnNumber: number;
+  userId: number;
+  startedAt: string;
+  expiresAt: string;
+}
+
+export interface GameTurnSubmittedEvent {
+  gameId: number;
+  roomId: number;
+  submittedTurn: { turnNumber: number; userId: number; imageKey: string };
+}
+
+export interface GameTurnExpiredEvent {
+  gameId: number;
+  roomId: number;
+  expiredTurn: { turnNumber: number; userId: number };
+}
+
+export interface GameFinishedEvent {
+  gameId: number;
+  roomId: number;
+}
+
+export interface SubmitTurnResult {
+  finished: boolean;
+  gameId: number;
+  roomId: number;
+  nextTurn: {
+    turnNumber: number;
+    userId: number;
+    startedAt: string;
+    expiresAt: string;
+  } | null;
+  submittedTurn: { turnNumber: number; userId: number; imageKey: string };
+}
+
 export interface ServerToClientEvents {
   "lobby:state": (state: LobbyState) => void;
   "lobby:ready-changed": (member: {
@@ -80,6 +136,12 @@ export interface ServerToClientEvents {
     currentParticipants: number;
   }) => void;
   "lobby:room-closed": (result: { roomId: number }) => void;
+  "lobby:game-started": (payload: GameStartedBroadcast) => void;
+  "game:state": (state: GameSessionState) => void;
+  "game:turn-started": (event: GameTurnStartedEvent) => void;
+  "game:turn-submitted": (event: GameTurnSubmittedEvent) => void;
+  "game:turn-expired": (event: GameTurnExpiredEvent) => void;
+  "game:finished": (event: GameFinishedEvent) => void;
   exception: (error: SocketFailure) => void;
 }
 export interface ClientToServerEvents {
@@ -102,5 +164,17 @@ export interface ClientToServerEvents {
   "lobby:leave": (
     body: { roomId: number },
     ack: (result: Acknowledgement & LeaveResult) => void,
+  ) => void;
+  "game:start": (
+    body: { roomId: number },
+    ack: (result: Acknowledgement & GameStartedBroadcast) => void,
+  ) => void;
+  "game:subscribe": (
+    body: { gameId: number },
+    ack: (result: Acknowledgement & { gameId: number }) => void,
+  ) => void;
+  "game:turn:submit": (
+    body: { gameId: number; imageKey: string },
+    ack: (result: Acknowledgement & SubmitTurnResult) => void,
   ) => void;
 }
