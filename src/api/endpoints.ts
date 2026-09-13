@@ -6,13 +6,18 @@ export const endpoints = {
     me: "/auth/me",
     signup: "/auth/signup",
   },
+  user: {
+    devLogin: (accountNumber: number) =>
+      `/users/dev-login/${accountNumber}`,
+  },
   room: {
     list: "/rooms",
     create: "/rooms",
-    join: "/rooms/join",
-    detail: (roomId: string | number) => `/rooms/${encodePathSegment(roomId)}`,
-    ready: (roomId: string | number) => `/rooms/${encodePathSegment(roomId)}/ready`,
-    start: (roomId: string | number) => `/rooms/${encodePathSegment(roomId)}/start`,
+    join: (roomId: number) => `/rooms/${encodePathSegment(roomId)}/join`,
+    codeJoin: (inviteCode: string) => `/rooms/invites/${encodePathSegment(inviteCode)}/join`,
+    detail: (roomId: number) => `/rooms/${encodePathSegment(roomId)}`,
+    ready: (roomId: number) => `/rooms/${encodePathSegment(roomId)}/ready`,
+    start: (roomId: number) => `/rooms/${encodePathSegment(roomId)}/start`,
   },
   game: {
     state: (roomId: string | number) => `/rooms/${encodePathSegment(roomId)}/game`,
