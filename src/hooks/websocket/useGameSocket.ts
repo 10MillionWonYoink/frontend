@@ -30,9 +30,7 @@ export function useGameSocket(gameId: number | undefined, enabled: boolean) {
     setStatus("connecting");
     setError(null);
 
-    const patchGame = (
-      updater: (previous: GameSessionState) => GameSessionState,
-    ) => {
+    const patchGame = (updater: (previous: GameSessionState) => GameSessionState) => {
       queryClient.setQueryData<GameSessionState>(
         gameQueryKeys.detail(gameId),
         (previous) => (previous ? updater(previous) : previous),
