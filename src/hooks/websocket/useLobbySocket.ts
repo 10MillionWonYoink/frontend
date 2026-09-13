@@ -9,6 +9,7 @@ import {
 import { refreshSession } from "../../api/client";
 import type {
   Acknowledgement,
+  HostChangeResult,
   LeaveResult,
   RoomUpdate,
   RoomUpdated,
@@ -44,6 +45,10 @@ export function useLobbySocket(roomId: number, enabled: boolean) {
     const refreshLists = () => {
       void queryClient.invalidateQueries({ queryKey: roomQueryKeys.list });
       void queryClient.invalidateQueries({ queryKey: roomQueryKeys.mine });
+    };
+    const refreshRoomAndLists = () => {
+      refreshRoom();
+      refreshLists();
     };
     socket.on("connect", () => {
       subscribedRef.current = false;
@@ -122,19 +127,13 @@ export function useLobbySocket(roomId: number, enabled: boolean) {
       refreshRoom();
     });
     socket.on("lobby:room-updated", (room) => {
-      if (room.id === roomId) {
-        refreshRoom();
-        refreshLists();
-      }
+      if (room.id === roomId) refreshRoomAndLists();
     });
     socket.on("lobby:host-changed", (result) => {
       if (result.roomId === roomId) refreshRoom();
     });
     socket.on("lobby:member-left", (result) => {
-      if (result.roomId === roomId) {
-        refreshRoom();
-        refreshLists();
-      }
+      if (result.roomId === roomId) refreshRoomAndLists();
     });
     socket.on("lobby:room-closed", (result) => {
       if (result.roomId !== roomId) return;
@@ -192,15 +191,8 @@ export function useLobbySocket(roomId: number, enabled: boolean) {
       const socket = requireSocket();
       return acknowledge(
         socket,
-        (
-          done: (
-            result: Acknowledgement & {
-              roomId: number;
-              previousHostId: number;
-              newHostId: number;
-            },
-          ) => void,
-        ) => socket.emit("lobby:host:change", { roomId, newHostUserId }, done),
+        (done: (result: Acknowledgement & HostChangeResult) => void) =>
+          socket.emit("lobby:host:change", { roomId, newHostUserId }, done),
       );
     },
     [requireSocket, roomId],

@@ -1,6 +1,7 @@
 import { ArrowUpRight, Users } from "lucide-react";
 import type { RoomSummary } from "../../types/room";
 import { Badge } from "../common/Badge";
+import { getRoomStatusLabel } from "../../utils/get-room-status-label";
 
 interface RoomListProps {
   rooms: RoomSummary[];
@@ -55,13 +56,7 @@ export function RoomList({
               </div>
               <div className="flex shrink-0 flex-col items-end gap-2">
                 <Badge tone={isAvailable ? "mint" : "purple"}>
-                  {room.status === "WAITING"
-                    ? "대기 중"
-                    : room.status === "READY"
-                      ? "시작 준비"
-                      : room.status === "PLAYING"
-                        ? "진행 중"
-                        : "종료"}
+                  {getRoomStatusLabel(room.status)}
                 </Badge>
                 <span className="flex items-center gap-1 text-xs font-bold text-[#6c4cff]">
                   {pendingRoomId === room.id

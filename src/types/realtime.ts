@@ -60,6 +60,11 @@ export interface LeaveResult {
 
 export type Acknowledgement = { success: true };
 export type SocketFailure = { message?: string | string[]; status?: string };
+export interface HostChangeResult {
+  roomId: number;
+  previousHostId: number;
+  newHostId: number;
+}
 export interface ServerToClientEvents {
   "lobby:state": (state: LobbyState) => void;
   "lobby:ready-changed": (member: {
@@ -68,11 +73,7 @@ export interface ServerToClientEvents {
     isReady: boolean;
   }) => void;
   "lobby:room-updated": (room: RoomUpdated) => void;
-  "lobby:host-changed": (result: {
-    roomId: number;
-    previousHostId: number;
-    newHostId: number;
-  }) => void;
+  "lobby:host-changed": (result: HostChangeResult) => void;
   "lobby:member-left": (result: {
     roomId: number;
     userId: number;
@@ -96,13 +97,7 @@ export interface ClientToServerEvents {
   ) => void;
   "lobby:host:change": (
     body: { roomId: number; newHostUserId: number },
-    ack: (
-      result: Acknowledgement & {
-        roomId: number;
-        previousHostId: number;
-        newHostId: number;
-      },
-    ) => void,
+    ack: (result: Acknowledgement & HostChangeResult) => void,
   ) => void;
   "lobby:leave": (
     body: { roomId: number },

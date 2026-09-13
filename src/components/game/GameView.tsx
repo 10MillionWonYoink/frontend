@@ -5,6 +5,7 @@ import { Badge } from "../common/Badge";
 import { Button } from "../common/Button";
 import { FeatureNotice } from "../common/FeatureNotice";
 import { RoomSettings } from "../room/RoomSettings";
+import { getRoomStatusLabel } from "../../utils/get-room-status-label";
 
 export function GameView({ room }: { room: Room }) {
   return (
@@ -20,15 +21,7 @@ export function GameView({ room }: { room: Room }) {
           <h1 className="min-w-0 break-words text-xl font-black text-[#342953]">
             {room.title}
           </h1>
-          <Badge>
-            {room.status === "PLAYING"
-              ? "진행 중"
-              : room.status === "FINISHED"
-                ? "종료"
-                : room.status === "READY"
-                  ? "시작 준비"
-                  : "대기 중"}
-          </Badge>
+          <Badge>{getRoomStatusLabel(room.status)}</Badge>
         </div>
       </header>
       <div className="flex-1 space-y-4 px-5 py-5">

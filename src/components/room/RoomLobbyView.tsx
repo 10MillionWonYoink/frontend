@@ -1,5 +1,4 @@
 import { Check, Clipboard, Rocket } from "lucide-react";
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import type { Room, RoomPlayer } from "../../types/room";
 import type { RoomUpdate } from "../../types/realtime";
@@ -8,8 +7,8 @@ import { Card } from "../common/Card";
 import { PlayerGrid } from "./PlayerGrid";
 import { RoomSettings } from "./RoomSettings";
 import { RoomManageControls } from "./RoomManageControls";
+import { useCopyToClipboard } from "../../hooks/use-copy-to-clipboard";
 
-const COPY_FEEDBACK_DURATION_MS = 1_500;
 const MAX_VISIBLE_INVITATION_CODE_LENGTH = 12;
 const VISIBLE_INVITATION_CODE_PREFIX_LENGTH = 6;
 const VISIBLE_INVITATION_CODE_SUFFIX_LENGTH = 3;
@@ -39,32 +38,13 @@ export function RoomLobbyView({
   onChangeHost,
   room,
 }: RoomLobbyViewProps) {
-  const [isCopied, setIsCopied] = useState(false);
-  const [copyError, setCopyError] = useState(false);
+  const { isCopied, copyError, copy } = useCopyToClipboard(room.invitationCode);
   const isLongInvitationCode =
     room.invitationCode.length > MAX_VISIBLE_INVITATION_CODE_LENGTH;
   const displayInvitationCode = isLongInvitationCode
     ? `${room.invitationCode.slice(0, VISIBLE_INVITATION_CODE_PREFIX_LENGTH)}...${room.invitationCode.slice(-VISIBLE_INVITATION_CODE_SUFFIX_LENGTH)}`
     : room.invitationCode;
   const canAct = socketStatus === "open" && room.status === "WAITING" && !isMutating;
-  useEffect(() => {
-    if (!isCopied) return;
-    const timerId = window.setTimeout(
-      () => setIsCopied(false),
-      COPY_FEEDBACK_DURATION_MS,
-    );
-    return () => window.clearTimeout(timerId);
-  }, [isCopied]);
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(room.invitationCode);
-      setIsCopied(true);
-      setCopyError(false);
-    } catch {
-      setIsCopied(false);
-      setCopyError(true);
-    }
-  };
   return (
     <>
       <header className="bg-gradient-to-br from-[#6c4cff] to-[#b36bff] px-5 pb-8 pt-[max(1.25rem,env(safe-area-inset-top))] text-white">
@@ -101,7 +81,7 @@ export function RoomLobbyView({
             </strong>
             <Button
               variant="ghost"
-              onClick={() => void handleCopy()}
+              onClick={() => void copy()}
               className="min-h-10 shrink-0 px-3 py-2"
             >
               {isCopied ? (

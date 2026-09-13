@@ -7,6 +7,7 @@ import {
   joinRoom,
   joinByInviteCode,
 } from "../../api/room";
+import { isValidRoomId } from "../../utils/is-valid-room-id";
 
 export const roomQueryKeys = {
   all: ["rooms"] as const,
@@ -37,7 +38,7 @@ export function useRoom(roomId: string | undefined) {
   return useQuery({
     queryKey: roomQueryKeys.detail(roomId ?? ""),
     queryFn: () => getRoom(roomId ?? ""),
-    enabled: Boolean(roomId) && /^\d+$/.test(roomId ?? "") && Number(roomId) > 0,
+    enabled: isValidRoomId(roomId),
     // Backend does not broadcast REST joins; refresh membership while in the lobby.
     refetchInterval: (query) =>
       ["WAITING", "READY"].includes(query.state.data?.status ?? "") ? 5_000 : false,
@@ -58,9 +59,16 @@ export function useCreateRoom() {
 export function useJoinRoom() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: joinRoom,
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: roomQueryKeys.all });
+    mutationFn: async (roomId: number) => {
+      // The REST join route is not idempotent. Check current membership before writing.
+      const currentRooms = await getMyRooms();
+      const alreadyJoined = currentRooms.some((room) => room.id === roomId);
+      if (!alreadyJoined) await joinRoom(roomId);
+      return alreadyJoined;
+    },
+    onSuccess: (alreadyJoined) => {
+      if (!alreadyJoined)
+        void queryClient.invalidateQueries({ queryKey: roomQueryKeys.all });
     },
   });
 }

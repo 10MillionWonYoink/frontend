@@ -5,6 +5,7 @@ import { Button } from "../components/common/Button";
 import { RoomLobbyView } from "../components/room/RoomLobbyView";
 import { useRoomLobby } from "../hooks/room/use-room-lobby";
 import { getApiErrorMessage } from "../utils/get-api-error-message";
+import { isValidRoomId } from "../utils/is-valid-room-id";
 
 export function RoomContainer() {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ export function RoomContainer() {
       navigate(`/rooms/${roomId}/game`, { replace: true });
     if (lobby.socket.roomClosed) navigate("/", { replace: true });
   }, [lobby.room?.status, lobby.socket.roomClosed, navigate, roomId]);
-  if (!/^\d+$/.test(roomId) || Number(roomId) <= 0)
+  if (!isValidRoomId(roomId))
     return <ErrorState message="게임방 주소가 올바르지 않습니다." />;
   if (lobby.isPending) return <LoadingState message="게임방에 입장하고 있어요." />;
   if (lobby.roomError || !lobby.room)

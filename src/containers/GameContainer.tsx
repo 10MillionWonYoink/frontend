@@ -3,11 +3,12 @@ import { ErrorState, LoadingState } from "../components/common/AsyncState";
 import { GameView } from "../components/game/GameView";
 import { useGameSession } from "../hooks/game/use-game-session";
 import { getApiErrorMessage } from "../utils/get-api-error-message";
+import { isValidRoomId } from "../utils/is-valid-room-id";
 
 export function GameContainer() {
   const { roomId = "" } = useParams();
   const session = useGameSession(roomId);
-  if (!/^\d+$/.test(roomId) || Number(roomId) <= 0)
+  if (!isValidRoomId(roomId))
     return <ErrorState message="게임 주소가 올바르지 않습니다." />;
   if (session.isPending) return <LoadingState message="방 정보를 확인하고 있어요." />;
   if (session.error || !session.room)

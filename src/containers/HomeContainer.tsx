@@ -15,7 +15,6 @@ import {
   useMyRooms,
   useRooms,
 } from "../hooks/room/use-rooms";
-import { getMyRooms } from "../api/room";
 import { getApiErrorMessage } from "../utils/get-api-error-message";
 
 export function HomeContainer() {
@@ -35,10 +34,7 @@ export function HomeContainer() {
     setPendingRoomId(roomId);
     setJoinError(undefined);
     try {
-      // The REST join route is not idempotent. Check current membership before writing.
-      const currentRooms = await getMyRooms();
-      if (!currentRooms.some((room) => room.id === roomId))
-        await joinMutation.mutateAsync(roomId);
+      await joinMutation.mutateAsync(roomId);
       navigate(`/rooms/${roomId}`);
     } catch (error) {
       setJoinError(getApiErrorMessage(error, "방에 참여하지 못했습니다."));
