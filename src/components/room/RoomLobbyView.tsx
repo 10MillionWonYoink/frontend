@@ -9,10 +9,6 @@ import { RoomSettings } from "./RoomSettings";
 import { RoomManageControls } from "./RoomManageControls";
 import { useCopyToClipboard } from "../../hooks/use-copy-to-clipboard";
 
-const MAX_VISIBLE_INVITATION_CODE_LENGTH = 12;
-const VISIBLE_INVITATION_CODE_PREFIX_LENGTH = 6;
-const VISIBLE_INVITATION_CODE_SUFFIX_LENGTH = 3;
-
 interface RoomLobbyViewProps {
   currentPlayer: RoomPlayer | undefined;
   isMutating: boolean;
@@ -28,31 +24,28 @@ interface RoomLobbyViewProps {
 }
 
 export function RoomLobbyView({
-  currentPlayer,
-  isMutating,
-  socketStatus,
-  actionError,
-  onReconnect,
-  onLeave,
-  onReadyChange,
-  onUpdateRoom,
-  onChangeHost,
-  onStartGame,
-  room,
-}: RoomLobbyViewProps) {
+                                currentPlayer,
+                                isMutating,
+                                socketStatus,
+                                actionError,
+                                onReconnect,
+                                onLeave,
+                                onReadyChange,
+                                onUpdateRoom,
+                                onChangeHost,
+                                onStartGame,
+                                room,
+                              }: RoomLobbyViewProps) {
   const { isCopied, copyError, copy } = useCopyToClipboard(room.invitationCode);
-  const isLongInvitationCode =
-    room.invitationCode.length > MAX_VISIBLE_INVITATION_CODE_LENGTH;
-  const displayInvitationCode = isLongInvitationCode
-    ? `${room.invitationCode.slice(0, VISIBLE_INVITATION_CODE_PREFIX_LENGTH)}...${room.invitationCode.slice(-VISIBLE_INVITATION_CODE_SUFFIX_LENGTH)}`
-    : room.invitationCode;
   const canAct = socketStatus === "open" && room.status === "WAITING" && !isMutating;
   const everyoneElseReady = room.players
     .filter((player) => !player.isHost)
     .every((player) => player.isReady);
+
   return (
     <>
-      <header className="bg-gradient-to-br from-[#6c4cff] to-[#b36bff] px-5 pb-8 pt-[max(1.25rem,env(safe-area-inset-top))] text-white">
+      <header
+        className="bg-gradient-to-br from-[#6c4cff] to-[#b36bff] px-5 pb-8 pt-[max(1.25rem,env(safe-area-inset-top))] text-white">
         <div className="flex items-center justify-between">
           <button
             type="button"
@@ -82,7 +75,7 @@ export function RoomLobbyView({
               title={room.invitationCode}
               aria-label={room.invitationCode}
             >
-              {displayInvitationCode}
+              {room.invitationCode}
             </strong>
             <Button
               variant="ghost"
@@ -94,7 +87,6 @@ export function RoomLobbyView({
               ) : (
                 <Clipboard className="size-4" />
               )}
-              <span className="ml-1">{isCopied ? "복사됨" : "복사"}</span>
             </Button>
           </div>
           {copyError && (
