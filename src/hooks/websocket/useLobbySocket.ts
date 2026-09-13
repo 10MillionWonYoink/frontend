@@ -101,8 +101,8 @@ export function useLobbySocket(roomId: number, enabled: boolean) {
       setError(socketErrorMessage(cause));
       refreshRoom();
     });
-    socket.on("lobby:state", (state) => {
-      if (state.id === roomId) refreshRoom();
+    socket.on("lobby:member-joined", () => {
+      refreshRoomAndLists();
     });
     socket.on("lobby:ready-changed", (member) => {
       if (member.roomId !== roomId) return;
@@ -116,11 +116,6 @@ export function useLobbySocket(roomId: number, enabled: boolean) {
                   player.id === member.userId
                     ? { ...player, isReady: member.isReady }
                     : player,
-                ),
-                members: previous.members.map((item) =>
-                  item.userId === member.userId
-                    ? { ...item, isReady: member.isReady }
-                    : item,
                 ),
               }
             : previous,

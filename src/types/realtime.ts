@@ -1,29 +1,5 @@
-import type { BackendRoomStatus } from "./room";
+import type { BackendRoomPlayer, BackendRoomStatus } from "./room";
 import type { GameSessionState, GameSessionStatus } from "./game";
-
-export interface LobbyState {
-  id: number;
-  title: string;
-  status: BackendRoomStatus;
-  hostId: number;
-  host: { id: number; nickname: string | null; profileImageUrl: string | null };
-  minParticipants: number;
-  maxParticipants: number;
-  currentParticipants: number;
-  isPublic: boolean;
-  inviteCode: string;
-  relayCount: number;
-  timeLimitSeconds: number;
-  members: {
-    memberId: number;
-    userId: number;
-    nickname: string | null;
-    profileImageUrl: string | null;
-    isReady: boolean;
-    isHost: boolean;
-    joinedAt: string;
-  }[];
-}
 
 export interface RoomUpdate {
   roomId: number;
@@ -122,7 +98,7 @@ export interface SubmitTurnResult {
 }
 
 export interface ServerToClientEvents {
-  "lobby:state": (state: LobbyState) => void;
+  "lobby:member-joined": (member: BackendRoomPlayer) => void;
   "lobby:ready-changed": (member: {
     roomId: number;
     userId: number;
