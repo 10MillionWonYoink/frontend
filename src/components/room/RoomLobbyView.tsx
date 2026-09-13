@@ -24,18 +24,18 @@ interface RoomLobbyViewProps {
 }
 
 export function RoomLobbyView({
-                                currentPlayer,
-                                isMutating,
-                                socketStatus,
-                                actionError,
-                                onReconnect,
-                                onLeave,
-                                onReadyChange,
-                                onUpdateRoom,
-                                onChangeHost,
-                                onStartGame,
-                                room,
-                              }: RoomLobbyViewProps) {
+  currentPlayer,
+  isMutating,
+  socketStatus,
+  actionError,
+  onReconnect,
+  onLeave,
+  onReadyChange,
+  onUpdateRoom,
+  onChangeHost,
+  onStartGame,
+  room,
+}: RoomLobbyViewProps) {
   const { isCopied, copyError, copy } = useCopyToClipboard(room.invitationCode);
   const canAct = socketStatus === "open" && room.status === "WAITING" && !isMutating;
   const everyoneElseReady = room.players
@@ -47,8 +47,7 @@ export function RoomLobbyView({
 
   return (
     <>
-      <header
-        className="bg-gradient-to-br from-[#6c4cff] to-[#b36bff] px-5 pb-8 pt-[max(1.25rem,env(safe-area-inset-top))] text-white">
+      <header className="bg-gradient-to-br from-[#6c4cff] to-[#b36bff] px-5 pb-8 pt-[max(1.25rem,env(safe-area-inset-top))] text-white">
         <div className="flex items-center justify-between">
           <button
             type="button"
