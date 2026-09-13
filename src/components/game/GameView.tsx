@@ -1,118 +1,138 @@
-import { Send, Wifi, WifiOff } from "lucide-react";
-import type { GameState } from "../../types/game";
-import type { GameSocketStatus } from "../../hooks/websocket/useGameSocket";
+import { Camera } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useMemo } from "react";
+import type { Room } from "../../types/room";
+import type { GameSessionState } from "../../types/game";
 import { Badge } from "../common/Badge";
 import { Button } from "../common/Button";
-import { Card } from "../common/Card";
-import { CameraPreview } from "./CameraPreview";
+import { FeatureNotice } from "../common/FeatureNotice";
+import { RoomSettings } from "../room/RoomSettings";
+import { getRoomStatusLabel } from "../../utils/get-room-status-label";
+import { createPlaceholderImageKey } from "../../utils/create-placeholder-image-key";
+import { getApiErrorMessage } from "../../utils/get-api-error-message";
 import { Timer } from "./Timer";
+import { CameraPreview } from "./CameraPreview";
+import { useCountdown } from "../../hooks/game/use-countdown";
+import { usePhotoSelection } from "../../hooks/game/use-photo-selection";
 
 interface GameViewProps {
-  game: GameState;
+  room: Room;
+  game: GameSessionState;
+  meUserId: number | undefined;
+  socketStatus: string;
+  onSubmitTurn: (imageKey: string) => Promise<unknown>;
   isSubmitting: boolean;
-  onPhotoSelect: (photo: File) => void;
-  onSubmit: () => void;
-  previewUrl: string | null;
-  remainingSeconds: number;
-  selectedPhoto: File | null;
-  socketStatus: GameSocketStatus;
-  submitErrorMessage?: string;
+  submitError: unknown;
 }
 
 export function GameView({
+  room,
   game,
-  isSubmitting,
-  onPhotoSelect,
-  onSubmit,
-  previewUrl,
-  remainingSeconds,
-  selectedPhoto,
+  meUserId,
   socketStatus,
-  submitErrorMessage,
+  onSubmitTurn,
+  isSubmitting,
+  submitError,
 }: GameViewProps) {
-  const hasSubmitted = game.status === "SUBMITTED";
-  const canTakePhoto = game.status === "MY_TURN" && !hasSubmitted;
-  const visibleImageUrl = previewUrl ?? game.submittedImageUrl;
+  const currentTurn = game.currentTurn;
+  const isMyTurn = Boolean(
+    currentTurn && meUserId !== undefined && currentTurn.userId === meUserId,
+  );
+  const expiresAt = currentTurn?.expiresAt;
+  const initialSeconds = useMemo(() => {
+    if (!expiresAt) return 0;
+    return Math.max(0, Math.round((new Date(expiresAt).getTime() - Date.now()) / 1000));
+  }, [expiresAt]);
+  const remainingSeconds = useCountdown(initialSeconds, !currentTurn);
+  const { previewUrl, selectedPhoto, selectPhoto } = usePhotoSelection();
+
+  const handleSubmit = async () => {
+    if (!selectedPhoto) return;
+    try {
+      await onSubmitTurn(createPlaceholderImageKey(selectedPhoto));
+      selectPhoto(null);
+    } catch {
+      /* 제출 에러는 하단에 표시된다. */
+    }
+  };
 
   return (
     <>
-      <header className="border-b border-[#eeeaf8] bg-white px-5 pb-4 pt-[max(1rem,env(safe-area-inset-top))]">
-        <div className="flex items-center justify-between">
-          <Badge>
-            라운드 {game.round} / {game.totalRounds}
-          </Badge>
-          <span className="text-xs font-bold text-[#8b85a8]">
-            턴 {game.turnOrder} / {game.totalPlayers}
-          </span>
-        </div>
-        <div className="mt-3 flex items-center justify-between rounded-2xl bg-[#f0ebff] p-3">
-          <div className="min-w-0">
-            <p className="flex items-center gap-1 text-[11px] text-[#8b85a8]">
-              {socketStatus === "open" ? (
-                <Wifi className="size-3 text-[#00a98f]" aria-label="실시간 연결됨" />
-              ) : (
-                <WifiOff
-                  className="size-3 text-[#d93f75]"
-                  aria-label="실시간 연결 중"
-                />
-              )}
-              현재 차례
-            </p>
-            <strong className="block truncate text-base font-black text-[#6c4cff]">
-              {canTakePhoto
-                ? "🎯 내 차례예요!"
-                : `${game.currentPlayerNickname}님의 차례`}
-            </strong>
-          </div>
-          <Timer seconds={remainingSeconds} />
+      <header className="border-b border-[#eeeaf8] bg-white px-5 pb-5 pt-[max(1rem,env(safe-area-inset-top))]">
+        <Link
+          to={`/rooms/${room.id}`}
+          className="inline-flex min-h-10 items-center text-xs font-bold text-[#6c4cff]"
+        >
+          ← 방 정보로
+        </Link>
+        <div className="mt-2 flex items-center justify-between gap-3">
+          <h1 className="min-w-0 break-words text-xl font-black text-[#342953]">
+            {room.title}
+          </h1>
+          <Badge>{getRoomStatusLabel(room.status)}</Badge>
         </div>
       </header>
-
-      <div className="flex-1 space-y-4 overflow-y-auto px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4">
-        <Card className="border-0 bg-gradient-to-br from-[#fff5cf] to-[#ffe2ec]">
-          <p className="text-xs font-bold text-[#a3781a]">
-            {game.missionEmoji} 이번 미션
-          </p>
-          <h1 className="mt-1 text-xl font-black tracking-[-0.02em] text-[#342953]">
-            {game.mission}
-          </h1>
-          <p className="mt-1 text-xs text-[#8b85a8]">
-            창의적일수록 높은 점수를 받아요 ✨
-          </p>
-        </Card>
-
-        <CameraPreview
-          imageUrl={visibleImageUrl}
-          isDisabled={!canTakePhoto || isSubmitting}
-          onPhotoSelect={onPhotoSelect}
-        />
-
-        {submitErrorMessage && (
-          <p role="alert" className="text-xs font-semibold text-[#d93f75]">
-            {submitErrorMessage}
-          </p>
+      <div className="flex-1 space-y-4 px-5 py-5">
+        {game.status === "countdown" && (
+          <FeatureNotice title="게임이 곧 시작해요">
+            잠시 후 첫 번째 차례가 시작됩니다.
+          </FeatureNotice>
         )}
-
-        {hasSubmitted ? (
-          <div className="rounded-2xl bg-[#d8f7ef] px-4 py-4 text-center text-sm font-extrabold text-[#008d78]">
-            사진 제출 완료! 다음 턴을 기다려주세요.
-          </div>
+        {currentTurn ? (
+          <>
+            <div className="flex items-center justify-between rounded-2xl bg-[#eee9ff] p-4 text-sm text-[#8b85a8]">
+              <span>
+                {isMyTurn ? "내 차례예요" : `${currentTurn.nickname}님의 차례`} ·{" "}
+                {currentTurn.turnNumber}/{game.totalTurns}
+              </span>
+              <Timer seconds={remainingSeconds} />
+            </div>
+            {isMyTurn ? (
+              <>
+                <CameraPreview
+                  imageUrl={previewUrl}
+                  isDisabled={isSubmitting}
+                  onPhotoSelect={selectPhoto}
+                />
+                {submitError ? (
+                  <p role="alert" className="text-sm text-[#d93f75]">
+                    {getApiErrorMessage(submitError, "사진을 제출하지 못했습니다.")}
+                  </p>
+                ) : null}
+                <Button
+                  disabled={
+                    !selectedPhoto || isSubmitting || socketStatus !== "open"
+                  }
+                  fullWidth
+                  onClick={() => void handleSubmit()}
+                  className="min-h-14"
+                >
+                  {isSubmitting ? "제출 중..." : "사진 제출하기"}
+                </Button>
+              </>
+            ) : (
+              <div className="flex min-h-64 flex-col items-center justify-center rounded-[1.75rem] bg-[#21173b] text-white/70">
+                <Camera className="size-12" aria-hidden="true" />
+                <p className="mt-4 text-sm font-bold">
+                  {currentTurn.nickname}님이 촬영 중이에요
+                </p>
+                <p className="mt-2 text-xs">차례가 되면 알려드릴게요.</p>
+              </div>
+            )}
+          </>
         ) : (
-          <Button
-            fullWidth
-            className="min-h-16 gap-2 text-base"
-            disabled={
-              !canTakePhoto || !selectedPhoto || isSubmitting || remainingSeconds === 0
-            }
-            onClick={onSubmit}
+          <FeatureNotice title="차례를 기다리고 있어요">
+            곧 다음 참여자의 차례가 시작됩니다.
+          </FeatureNotice>
+        )}
+        <RoomSettings room={room} />
+        {room.status === "FINISHED" && (
+          <Link
+            to={`/rooms/${room.id}/result`}
+            className="block rounded-2xl bg-[#eee9ff] p-4 text-center text-sm font-bold text-[#6c4cff]"
           >
-            <Send className="size-5" aria-hidden="true" />
-            {isSubmitting
-              ? "사진을 제출하고 있어요..."
-              : canTakePhoto
-                ? "이 사진 제출하기"
-                : "내 차례를 기다려주세요"}
-          </Button>
+            결과 화면으로
+          </Link>
         )}
       </div>
     </>

@@ -1,17 +1,22 @@
-export interface Ranking {
-  rank: number;
+import type { GameSessionStatus, GameTurnStatus } from "./game";
+
+export interface GameResultTurn {
+  turnNumber: number;
   userId: number;
   nickname: string;
-  avatar: string | null;
-  score: number;
-  creativity: number;
-  photoUrl: string | null;
-  feedback: string;
+  profileImageUrl: string | null;
+  status: GameTurnStatus;
+  imageKey: string | null;
+  submittedAt: string | null;
 }
 
 export interface GameResult {
+  gameId: number;
   roomId: number;
-  title: string;
-  totalRounds: number;
-  rankings: Ranking[];
+  roomTitle: string | null;
+  status: GameSessionStatus;
+  totalTurns: number;
+  startedAt: string | null;
+  finishedAt: string | null;
+  turns: GameResultTurn[];
 }

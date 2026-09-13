@@ -1,39 +1,42 @@
-export type GameStatus =
-  "WAITING" | "PLAYING" | "MY_TURN" | "OTHER_TURN" | "SUBMITTED" | "FINISHED";
+export type GameSessionStatus = "countdown" | "in_progress" | "finished" | "cancelled";
+export type GameTurnStatus = "waiting" | "in_progress" | "submitted" | "expired";
 
-export interface GameState {
+export interface LatestGame {
+  gameId: number;
   roomId: number;
-  status: GameStatus;
-  round: number;
-  totalRounds: number;
-  turnOrder: number;
-  totalPlayers: number;
-  currentPlayerId: number;
-  currentPlayerNickname: string;
-  mission: string;
-  missionEmoji: string;
-  remainingSeconds: number;
-  submittedImageUrl: string | null;
+  status: GameSessionStatus;
+  countdownEndsAt: string | null;
+  currentTurnNumber: number;
+  totalTurns: number;
 }
 
-export type GameEventType =
-  "GAME_START" | "TURN_START" | "PHOTO_SUBMIT" | "TURN_END" | "GAME_FINISH";
-
-interface GameEvent<TType extends GameEventType, TPayload> {
-  type: TType;
-  payload: TPayload;
+export interface GameTurnSummary {
+  turnNumber: number;
+  userId: number;
+  nickname: string;
+  status: GameTurnStatus;
+  imageKey: string | null;
+  submittedAt: string | null;
 }
 
-export type GameSocketEvent =
-  | GameEvent<"GAME_START", GameState>
-  | GameEvent<"TURN_START", GameState>
-  | GameEvent<
-      "PHOTO_SUBMIT",
-      { playerId: number; imageUrl: string; remainingSeconds?: number }
-    >
-  | GameEvent<"TURN_END", Partial<GameState>>
-  | GameEvent<"GAME_FINISH", { roomId: number }>;
+export interface CurrentGameTurn {
+  turnNumber: number;
+  userId: number;
+  nickname: string;
+  startedAt: string;
+  expiresAt: string;
+}
 
-export interface SubmitPhotoResponse {
-  imageUrl: string;
+export interface GameSessionState {
+  gameId: number;
+  roomId: number;
+  status: GameSessionStatus;
+  countdownEndsAt: string | null;
+  startedAt: string | null;
+  finishedAt: string | null;
+  currentTurnNumber: number;
+  totalTurns: number;
+  timeLimitSeconds: number;
+  currentTurn: CurrentGameTurn | null;
+  turns: GameTurnSummary[];
 }

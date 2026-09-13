@@ -1,16 +1,19 @@
+import { useId } from "react";
 import type { RoomPlayer } from "../../types/room";
 import { Avatar } from "../common/Avatar";
 import { Badge } from "../common/Badge";
 
 interface PlayerGridProps {
   players: RoomPlayer[];
+  title?: string;
 }
 
-export function PlayerGrid({ players }: PlayerGridProps) {
+export function PlayerGrid({ players, title = "참여자" }: PlayerGridProps) {
+  const titleId = useId();
   return (
-    <section aria-labelledby="players-title">
-      <h2 id="players-title" className="mb-3 text-base font-black text-[#342953]">
-        참여자 ({players.length}명)
+    <section aria-labelledby={titleId}>
+      <h2 id={titleId} className="mb-3 text-base font-black text-[#342953]">
+        {title} ({players.length}명)
       </h2>
       <ul className="grid grid-cols-2 gap-2.5">
         {players.map((player) => (

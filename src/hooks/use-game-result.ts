@@ -1,14 +1,14 @@
-import { useQuery } from "@tanstack/react-query";
-import { getGameResult } from "../api/result";
-
-export const resultQueryKeys = {
-  detail: (roomId: string) => ["results", roomId] as const,
-};
+import { useLatestGameByRoom, useGameResultQuery } from "./game/use-games";
 
 export function useGameResult(roomId: string | undefined) {
-  return useQuery({
-    queryKey: resultQueryKeys.detail(roomId ?? ""),
-    queryFn: () => getGameResult(roomId ?? ""),
-    enabled: Boolean(roomId),
-  });
+  const latestGameQuery = useLatestGameByRoom(roomId);
+  const gameId = latestGameQuery.data?.gameId;
+  const resultQuery = useGameResultQuery(gameId);
+
+  return {
+    isPending: latestGameQuery.isPending || (Boolean(gameId) && resultQuery.isPending),
+    error: latestGameQuery.error ?? resultQuery.error,
+    data: resultQuery.data,
+    refetch: resultQuery.refetch,
+  };
 }
