@@ -22,13 +22,11 @@ export function ResultView({ room, result }: { room: Room; result: GameResult })
         </p>
       </header>
       <div className="-mt-3 flex-1 space-y-5 rounded-t-3xl bg-[#fbfaff] px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-6">
-        {/*
-          Backend가 topic/rankings/턴별 점수·피드백을 제공하게 되면 result에서
-          매핑해 아래 컴포넌트들에 prop으로만 넘기면 된다(topic=..., rankings=...,
-          turnInsights=...). 지금은 그런 데이터가 없어 prop 없이 호출한다.
-        */}
-        <GameTopicSection />
-        <FinalRankingSection />
+        <GameTopicSection topic={result.topic} />
+        <FinalRankingSection
+          ranking={result.ranking}
+          evaluationComplete={result.evaluationComplete}
+        />
         <RoundResultList
           turns={result.turns}
           totalTurns={result.totalTurns}
