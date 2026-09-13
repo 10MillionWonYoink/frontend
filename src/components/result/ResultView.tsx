@@ -34,6 +34,14 @@ export function ResultView({ room, result }: { room: Room; result: GameResult })
         </p>
       </header>
       <div className="-mt-3 flex-1 space-y-5 rounded-t-3xl bg-[#fbfaff] px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-6">
+        <section aria-labelledby="result-ranking">
+          <h2 id="result-ranking" className="text-base font-black text-[#342953]">
+            최종 랭킹
+          </h2>
+          <p className="mt-3 rounded-2xl bg-[#f1eef9] p-5 text-sm text-[#8b85a8]">
+            점수와 순위는 아직 제공되지 않아요.
+          </p>
+        </section>
         <section aria-labelledby="result-photos">
           <h2 id="result-photos" className="text-base font-black text-[#342953]">
             우리의 사진 릴레이

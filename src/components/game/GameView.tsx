@@ -100,9 +100,7 @@ export function GameView({
                   </p>
                 ) : null}
                 <Button
-                  disabled={
-                    !selectedPhoto || isSubmitting || socketStatus !== "open"
-                  }
+                  disabled={!selectedPhoto || isSubmitting || socketStatus !== "open"}
                   fullWidth
                   onClick={() => void handleSubmit()}
                   className="min-h-14"
@@ -120,6 +118,10 @@ export function GameView({
               </div>
             )}
           </>
+        ) : game.status === "finished" ? (
+          <FeatureNotice title="게임이 종료되었어요">
+            최종 결과를 확인해보세요.
+          </FeatureNotice>
         ) : (
           <FeatureNotice title="차례를 기다리고 있어요">
             곧 다음 참여자의 차례가 시작됩니다.
