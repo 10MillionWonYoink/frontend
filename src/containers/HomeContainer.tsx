@@ -9,6 +9,7 @@ import { Modal } from "../components/common/Modal";
 import { ChatPanel } from "../components/chat/ChatPanel";
 import { useMe } from "../hooks/use-me";
 import {
+  hasOtherActiveRoom,
   useCreateRoom,
   useJoinRoom,
   useJoinByInviteCode,
@@ -29,7 +30,7 @@ export function HomeContainer() {
   const [joinError, setJoinError] = useState<string>();
   const [chatOpen, setChatOpen] = useState(false);
   const joinedIds = new Set(myRoomsQuery.data?.map((room) => room.id));
-  const hasOtherActiveRoom = (myRoomsQuery.data?.length ?? 0) > 0;
+  const hasActiveRoom = hasOtherActiveRoom(myRoomsQuery.data ?? []);
   const handleJoin = async (roomId: number) => {
     if (pendingRoomId !== undefined) return;
     setPendingRoomId(roomId);
@@ -137,7 +138,7 @@ export function HomeContainer() {
             {joinError}
           </p>
         )}
-        {hasOtherActiveRoom && (
+        {hasActiveRoom && (
           <p className="mb-3 text-[11px] text-[#8b85a8]">
             이미 참여 중인 방이 있어요. 그 방에서 나가면 다른 방에 참여할 수 있어요.
           </p>
@@ -149,7 +150,7 @@ export function HomeContainer() {
             joinedIds={joinedIds}
             pendingRoomId={pendingRoomId}
             disabled={pendingRoomId !== undefined}
-            hasOtherActiveRoom={hasOtherActiveRoom}
+            hasOtherActiveRoom={hasActiveRoom}
           />
         )}
       </section>

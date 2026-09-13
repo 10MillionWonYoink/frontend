@@ -62,7 +62,7 @@ const ALREADY_IN_ANOTHER_ROOM_MESSAGE =
 
 // A finished game's membership row is never cleared (Backend only allows leaving a
 // WAITING room), so it must not count as "active" or the user could never join again.
-function hasOtherActiveRoom(currentRooms: MyRoomSummary[]): boolean {
+export function hasOtherActiveRoom(currentRooms: MyRoomSummary[]): boolean {
   return currentRooms.some((room) => room.status !== "finished");
 }
 

@@ -42,6 +42,9 @@ export function RoomLobbyView({
     .filter((player) => !player.isHost)
     .every((player) => player.isReady);
 
+  const hasEnoughPlayers = room.players.length >= room.minPlayers;
+  const canStartGame = canAct && hasEnoughPlayers && everyoneElseReady;
+
   return (
     <>
       <header
@@ -145,40 +148,43 @@ export function RoomLobbyView({
           >
             결과 화면 보기
           </Link>
-        ) : (
-          <>
+        ) : currentPlayer?.isHost ? (
+          <div>
             <Button
               fullWidth
-              variant={currentPlayer?.isReady ? "ghost" : "secondary"}
-              disabled={!currentPlayer || !canAct}
-              onClick={() => onReadyChange(!currentPlayer?.isReady)}
-              className="min-h-14"
+              disabled={!canStartGame}
+              onClick={onStartGame}
+              className="min-h-14 gap-2"
             >
-              {isMutating
-                ? "처리 중..."
-                : currentPlayer?.isReady
-                  ? "준비 취소"
-                  : "✓ 준비하기"}
+              <Rocket className="size-5" aria-hidden="true" />
+              {isMutating ? "처리 중..." : "게임 시작하기"}
             </Button>
-            {currentPlayer?.isHost && room.status === "WAITING" && (
-              <div className="mt-2">
-                <Button
-                  fullWidth
-                  disabled={!canAct || !everyoneElseReady}
-                  onClick={onStartGame}
-                  className="min-h-14 gap-2"
-                >
-                  <Rocket className="size-5" aria-hidden="true" />
-                  {isMutating ? "처리 중..." : "게임 시작하기"}
-                </Button>
-                {!everyoneElseReady && (
-                  <p className="mt-2 text-center text-xs text-[#8b85a8]">
-                    방장을 제외한 모든 참여자가 준비를 완료하면 시작할 수 있어요.
-                  </p>
-                )}
-              </div>
+            {!hasEnoughPlayers ? (
+              <p className="mt-2 text-center text-xs text-[#8b85a8]">
+                최소 {room.minPlayers}명이 모이면 시작할 수 있어요.
+              </p>
+            ) : (
+              !everyoneElseReady && (
+                <p className="mt-2 text-center text-xs text-[#8b85a8]">
+                  방장을 제외한 모든 참여자가 준비를 완료하면 시작할 수 있어요.
+                </p>
+              )
             )}
-          </>
+          </div>
+        ) : (
+          <Button
+            fullWidth
+            variant={currentPlayer?.isReady ? "ghost" : "secondary"}
+            disabled={!currentPlayer || !canAct}
+            onClick={() => onReadyChange(!currentPlayer?.isReady)}
+            className="min-h-14"
+          >
+            {isMutating
+              ? "처리 중..."
+              : currentPlayer?.isReady
+                ? "준비 취소"
+                : "✓ 준비하기"}
+          </Button>
         )}
       </div>
     </>
