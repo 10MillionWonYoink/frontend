@@ -7,9 +7,9 @@ interface FullScreenLoadingProps {
 }
 
 export function FullScreenLoading({
-                                    isOpen,
-                                    message = "처리 중입니다...",
-                                  }: FullScreenLoadingProps) {
+  isOpen,
+  message = "처리 중입니다...",
+}: FullScreenLoadingProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -38,9 +38,7 @@ export function FullScreenLoading({
       <div className="flex min-w-48 flex-col items-center gap-4 rounded-2xl bg-white px-8 py-6 shadow-xl">
         <span className="h-10 w-10 animate-spin rounded-full border-4 border-[#d9d0fa] border-t-[#7657e8]" />
 
-        <p className="text-sm font-bold text-[#342953]">
-          {message}
-        </p>
+        <p className="text-sm font-bold text-[#342953]">{message}</p>
       </div>
     </dialog>,
     document.body,

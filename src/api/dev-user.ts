@@ -10,9 +10,7 @@ export interface DevLoginResponse {
   };
 }
 
-export async function devLogin(
-  accountNumber: number,
-): Promise<DevLoginResponse> {
+export async function devLogin(accountNumber: number): Promise<DevLoginResponse> {
   const { data } = await api.post<DevLoginResponse>(
     endpoints.user.devLogin(accountNumber),
   );
