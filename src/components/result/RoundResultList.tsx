@@ -16,13 +16,6 @@ function turnBadgeTone(status: GameResultTurn["status"]): "mint" | "pink" | "pur
   return "purple";
 }
 
-// This is a UI-only shape for when Backend eventually provides per-turn AI
-// scoring/feedback — it is not part of the current GameResultTurn API contract.
-export interface TurnInsight {
-  score?: number;
-  feedback?: string;
-}
-
 interface RoundGroup {
   round: number;
   turns: GameResultTurn[];
@@ -53,15 +46,12 @@ interface RoundResultListProps {
   turns: GameResultTurn[];
   totalTurns: number;
   totalRounds: number;
-  // Keyed by turnNumber. Absent/empty today since Backend doesn't provide this yet.
-  turnInsights?: Record<number, TurnInsight>;
 }
 
 export function RoundResultList({
   turns,
   totalTurns,
   totalRounds,
-  turnInsights,
 }: RoundResultListProps) {
   const groups = groupTurnsByRound(turns, totalTurns, totalRounds);
 
@@ -92,52 +82,49 @@ export function RoundResultList({
                 </span>
               </summary>
               <ul className="space-y-2 border-t border-[#eeeaf8] p-3 pt-2">
-                {group.turns.map((turn) => {
-                  const insight = turnInsights?.[turn.turnNumber];
-                  return (
-                    <li
-                      key={turn.turnNumber}
-                      className="rounded-2xl border border-[#e9e4f7] bg-white p-3"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="grid size-7 shrink-0 place-items-center text-sm font-black text-[#6c4cff]">
-                          {turn.turnNumber}
-                        </span>
-                        <Avatar
-                          imageUrl={turn.profileImageUrl}
-                          nickname={turn.nickname}
-                          size="small"
-                        />
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-extrabold text-[#342953]">
-                            {turn.nickname}
-                          </p>
-                          <p className="truncate text-[11px] text-[#8b85a8]">
-                            {turn.submittedAt
-                              ? new Date(turn.submittedAt).toLocaleTimeString("ko-KR", {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                })
-                              : "-"}
-                          </p>
-                        </div>
-                        {insight?.score !== undefined && (
-                          <strong className="text-sm font-black text-[#6c4cff]">
-                            {insight.score}점
-                          </strong>
-                        )}
-                        <Badge tone={turnBadgeTone(turn.status)}>
-                          {TURN_STATUS_LABEL[turn.status]}
-                        </Badge>
-                      </div>
-                      {insight?.feedback && (
-                        <p className="mt-2 rounded-xl bg-[#f1eef9] px-3 py-2 text-[11px] text-[#8b85a8]">
-                          {insight.feedback}
+                {group.turns.map((turn) => (
+                  <li
+                    key={turn.turnNumber}
+                    className="rounded-2xl border border-[#e9e4f7] bg-white p-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="grid size-7 shrink-0 place-items-center text-sm font-black text-[#6c4cff]">
+                        {turn.turnNumber}
+                      </span>
+                      <Avatar
+                        imageUrl={turn.profileImageUrl}
+                        nickname={turn.nickname}
+                        size="small"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-extrabold text-[#342953]">
+                          {turn.nickname}
                         </p>
+                        <p className="truncate text-[11px] text-[#8b85a8]">
+                          {turn.submittedAt
+                            ? new Date(turn.submittedAt).toLocaleTimeString("ko-KR", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })
+                            : "-"}
+                        </p>
+                      </div>
+                      {turn.score !== null && (
+                        <strong className="text-sm font-black text-[#6c4cff]">
+                          {turn.score}점
+                        </strong>
                       )}
-                    </li>
-                  );
-                })}
+                      <Badge tone={turnBadgeTone(turn.status)}>
+                        {TURN_STATUS_LABEL[turn.status]}
+                      </Badge>
+                    </div>
+                    {turn.feedback && (
+                      <p className="mt-2 rounded-xl bg-[#f1eef9] px-3 py-2 text-[11px] text-[#8b85a8]">
+                        {turn.feedback}
+                      </p>
+                    )}
+                  </li>
+                ))}
               </ul>
             </details>
           );

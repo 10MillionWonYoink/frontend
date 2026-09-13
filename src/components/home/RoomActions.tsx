@@ -7,6 +7,7 @@ import { Modal } from "../common/Modal";
 interface RoomActionsProps {
   isCreating: boolean;
   isJoining: boolean;
+  hasActiveRoom: boolean;
   createError?: string;
   joinError?: string;
   onCreate: (request: CreateRoomRequest) => Promise<void>;
@@ -20,6 +21,7 @@ const inputClass =
 export function RoomActions({
   isCreating,
   isJoining,
+  hasActiveRoom,
   createError,
   joinError,
   onCreate,
@@ -65,6 +67,7 @@ export function RoomActions({
       <div className="grid grid-cols-2 gap-3">
         <Button
           onClick={() => open("create")}
+          disabled={hasActiveRoom}
           className="gap-1 whitespace-nowrap px-2 text-sm"
         >
           <Plus className="size-4" aria-hidden="true" />새 게임방

@@ -31,6 +31,7 @@ export interface GameSessionState {
   gameId: number;
   roomId: number;
   status: GameSessionStatus;
+  topic: string | null;
   countdownEndsAt: string | null;
   startedAt: string | null;
   finishedAt: string | null;

@@ -146,8 +146,10 @@ export function useGameSocket(gameId: number | undefined, enabled: boolean) {
         status: "finished",
         currentTurn: null,
       }));
+      // The room's active-membership status (used by the 1-room-per-user policy on
+      // Home) changes to finished here too, not just this room's own detail query.
       void queryClient.invalidateQueries({
-        queryKey: roomQueryKeys.detail(String(event.roomId)),
+        queryKey: roomQueryKeys.all,
       });
     });
     socket.connect();

@@ -30,5 +30,8 @@ export function useGameResultQuery(gameId: number | undefined) {
     queryKey: gameQueryKeys.result(gameId ?? 0),
     queryFn: () => getGameResult(gameId as number),
     enabled: Boolean(gameId),
+    // No realtime event announces when AI evaluation finishes; poll until it does.
+    refetchInterval: (query) =>
+      query.state.data?.evaluationComplete === false ? 5_000 : false,
   });
 }

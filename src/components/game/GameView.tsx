@@ -7,6 +7,7 @@ import { Badge } from "../common/Badge";
 import { Button } from "../common/Button";
 import { FeatureNotice } from "../common/FeatureNotice";
 import { RoomSettings } from "../room/RoomSettings";
+import { GameTopicSection } from "../result/GameTopicSection";
 import { getRoomStatusLabel } from "../../utils/get-room-status-label";
 import { createPlaceholderImageKey } from "../../utils/create-placeholder-image-key";
 import { getApiErrorMessage } from "../../utils/get-api-error-message";
@@ -73,6 +74,7 @@ export function GameView({
         </div>
       </header>
       <div className="flex-1 space-y-4 px-5 py-5">
+        <GameTopicSection topic={game.topic} />
         {game.status === "countdown" && (
           <FeatureNotice title="게임이 곧 시작해요">
             잠시 후 첫 번째 차례가 시작됩니다.

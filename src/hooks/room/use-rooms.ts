@@ -7,7 +7,7 @@ import {
   joinRoom,
   joinByInviteCode,
 } from "../../api/room";
-import type { MyRoomSummary } from "../../types/room";
+import type { CreateRoomRequest, MyRoomSummary } from "../../types/room";
 import { isValidRoomId } from "../../utils/is-valid-room-id";
 
 export const roomQueryKeys = {
@@ -47,16 +47,6 @@ export function useRoom(roomId: string | undefined) {
   });
 }
 
-export function useCreateRoom() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: createRoom,
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: roomQueryKeys.all });
-    },
-  });
-}
-
 const ALREADY_IN_ANOTHER_ROOM_MESSAGE =
   "이미 다른 방에 참여 중입니다. 기존 방에서 나간 뒤 다시 시도해주세요.";
 
@@ -64,6 +54,22 @@ const ALREADY_IN_ANOTHER_ROOM_MESSAGE =
 // WAITING room), so it must not count as "active" or the user could never join again.
 export function hasOtherActiveRoom(currentRooms: MyRoomSummary[]): boolean {
   return currentRooms.some((room) => room.status !== "finished");
+}
+
+export function useCreateRoom() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (request: CreateRoomRequest) => {
+      // Policy: a user may be an active member of only one room at a time.
+      const currentRooms = await getMyRooms();
+      if (hasOtherActiveRoom(currentRooms))
+        throw new Error(ALREADY_IN_ANOTHER_ROOM_MESSAGE);
+      return createRoom(request);
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: roomQueryKeys.all });
+    },
+  });
 }
 
 export function useJoinRoom() {
