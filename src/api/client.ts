@@ -22,6 +22,19 @@ interface RetryRequestConfig extends InternalAxiosRequestConfig {
 
 let refreshPromise: Promise<void> | null = null;
 
+// Share refresh across HTTP retries and Socket.IO authentication failures.
+export function refreshSession(): Promise<void> {
+  if (!refreshPromise) {
+    refreshPromise = refreshApi
+      .post("/auth/refresh")
+      .then(() => undefined)
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+  return refreshPromise;
+}
+
 api.interceptors.response.use(
   (response) => response,
 
@@ -35,17 +48,7 @@ api.interceptors.response.use(
     originalRequest._retry = true;
 
     try {
-      // 여러 API가 동시에 401이어도 refresh 요청은 한 번만 실행
-      if (!refreshPromise) {
-        refreshPromise = refreshApi
-          .post("/auth/refresh")
-          .then(() => undefined)
-          .finally(() => {
-            refreshPromise = null;
-          });
-      }
-
-      await refreshPromise;
+      await refreshSession();
 
       // 새 쿠키로 기존 API 다시 요청
       return api.request(originalRequest);

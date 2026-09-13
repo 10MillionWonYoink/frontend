@@ -1,14 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
-import { getGameResult } from "../api/result";
+import { useRoom } from "./room/use-rooms";
 
-export const resultQueryKeys = {
-  detail: (roomId: string) => ["results", roomId] as const,
-};
-
-export function useGameResult(roomId: string | undefined) {
-  return useQuery({
-    queryKey: resultQueryKeys.detail(roomId ?? ""),
-    queryFn: () => getGameResult(roomId ?? ""),
-    enabled: Boolean(roomId),
-  });
+// The existing detail response only provides room metadata, not results or photos.
+export function useResultRoom(roomId: string | undefined) {
+  return useRoom(roomId);
 }

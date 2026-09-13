@@ -1,3 +1,5 @@
+// Legacy presentation model only; no Backend API currently returns this shape.
+// Do not use this as an HTTP or Socket.IO response type. See docs/backend-integration.md.
 export interface Ranking {
   rank: number;
   userId: number;

@@ -1,118 +1,64 @@
-import { Send, Wifi, WifiOff } from "lucide-react";
-import type { GameState } from "../../types/game";
-import type { GameSocketStatus } from "../../hooks/websocket/useGameSocket";
+import { Camera, Clock3 } from "lucide-react";
+import { Link } from "react-router-dom";
+import type { Room } from "../../types/room";
 import { Badge } from "../common/Badge";
 import { Button } from "../common/Button";
-import { Card } from "../common/Card";
-import { CameraPreview } from "./CameraPreview";
-import { Timer } from "./Timer";
+import { FeatureNotice } from "../common/FeatureNotice";
+import { RoomSettings } from "../room/RoomSettings";
 
-interface GameViewProps {
-  game: GameState;
-  isSubmitting: boolean;
-  onPhotoSelect: (photo: File) => void;
-  onSubmit: () => void;
-  previewUrl: string | null;
-  remainingSeconds: number;
-  selectedPhoto: File | null;
-  socketStatus: GameSocketStatus;
-  submitErrorMessage?: string;
-}
-
-export function GameView({
-  game,
-  isSubmitting,
-  onPhotoSelect,
-  onSubmit,
-  previewUrl,
-  remainingSeconds,
-  selectedPhoto,
-  socketStatus,
-  submitErrorMessage,
-}: GameViewProps) {
-  const hasSubmitted = game.status === "SUBMITTED";
-  const canTakePhoto = game.status === "MY_TURN" && !hasSubmitted;
-  const visibleImageUrl = previewUrl ?? game.submittedImageUrl;
-
+export function GameView({ room }: { room: Room }) {
   return (
     <>
-      <header className="border-b border-[#eeeaf8] bg-white px-5 pb-4 pt-[max(1rem,env(safe-area-inset-top))]">
-        <div className="flex items-center justify-between">
+      <header className="border-b border-[#eeeaf8] bg-white px-5 pb-5 pt-[max(1rem,env(safe-area-inset-top))]">
+        <Link
+          to={`/rooms/${room.id}`}
+          className="inline-flex min-h-10 items-center text-xs font-bold text-[#6c4cff]"
+        >
+          ← 방 정보로
+        </Link>
+        <div className="mt-2 flex items-center justify-between gap-3">
+          <h1 className="min-w-0 break-words text-xl font-black text-[#342953]">
+            {room.title}
+          </h1>
           <Badge>
-            라운드 {game.round} / {game.totalRounds}
+            {room.status === "PLAYING"
+              ? "진행 중"
+              : room.status === "FINISHED"
+                ? "종료"
+                : room.status === "READY"
+                  ? "시작 준비"
+                  : "대기 중"}
           </Badge>
-          <span className="text-xs font-bold text-[#8b85a8]">
-            턴 {game.turnOrder} / {game.totalPlayers}
-          </span>
-        </div>
-        <div className="mt-3 flex items-center justify-between rounded-2xl bg-[#f0ebff] p-3">
-          <div className="min-w-0">
-            <p className="flex items-center gap-1 text-[11px] text-[#8b85a8]">
-              {socketStatus === "open" ? (
-                <Wifi className="size-3 text-[#00a98f]" aria-label="실시간 연결됨" />
-              ) : (
-                <WifiOff
-                  className="size-3 text-[#d93f75]"
-                  aria-label="실시간 연결 중"
-                />
-              )}
-              현재 차례
-            </p>
-            <strong className="block truncate text-base font-black text-[#6c4cff]">
-              {canTakePhoto
-                ? "🎯 내 차례예요!"
-                : `${game.currentPlayerNickname}님의 차례`}
-            </strong>
-          </div>
-          <Timer seconds={remainingSeconds} />
         </div>
       </header>
-
-      <div className="flex-1 space-y-4 overflow-y-auto px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4">
-        <Card className="border-0 bg-gradient-to-br from-[#fff5cf] to-[#ffe2ec]">
-          <p className="text-xs font-bold text-[#a3781a]">
-            {game.missionEmoji} 이번 미션
-          </p>
-          <h1 className="mt-1 text-xl font-black tracking-[-0.02em] text-[#342953]">
-            {game.mission}
-          </h1>
-          <p className="mt-1 text-xs text-[#8b85a8]">
-            창의적일수록 높은 점수를 받아요 ✨
-          </p>
-        </Card>
-
-        <CameraPreview
-          imageUrl={visibleImageUrl}
-          isDisabled={!canTakePhoto || isSubmitting}
-          onPhotoSelect={onPhotoSelect}
-        />
-
-        {submitErrorMessage && (
-          <p role="alert" className="text-xs font-semibold text-[#d93f75]">
-            {submitErrorMessage}
-          </p>
-        )}
-
-        {hasSubmitted ? (
-          <div className="rounded-2xl bg-[#d8f7ef] px-4 py-4 text-center text-sm font-extrabold text-[#008d78]">
-            사진 제출 완료! 다음 턴을 기다려주세요.
-          </div>
-        ) : (
-          <Button
-            fullWidth
-            className="min-h-16 gap-2 text-base"
-            disabled={
-              !canTakePhoto || !selectedPhoto || isSubmitting || remainingSeconds === 0
-            }
-            onClick={onSubmit}
+      <div className="flex-1 space-y-4 px-5 py-5">
+        <FeatureNotice title="게임 진행 기능을 준비하고 있어요">
+          아직 게임을 시작하거나 사진을 제출할 수 없어요. 방 설정과 참여자는 대기방에서
+          확인할 수 있어요.
+        </FeatureNotice>
+        <div className="flex items-center justify-between rounded-2xl bg-[#eee9ff] p-4 text-sm text-[#8b85a8]">
+          <span>현재 차례 · 확인 대기</span>
+          <span className="flex items-center gap-1">
+            <Clock3 className="size-4" aria-hidden="true" />
+            --:--
+          </span>
+        </div>
+        <div className="flex min-h-64 flex-col items-center justify-center rounded-[1.75rem] bg-[#21173b] text-white/70">
+          <Camera className="size-12" aria-hidden="true" />
+          <p className="mt-4 text-sm font-bold">사진 릴레이 준비 중</p>
+          <p className="mt-2 text-xs">게임이 시작되면 촬영할 수 있어요.</p>
+        </div>
+        <Button disabled fullWidth className="min-h-14">
+          사진 제출 준비 중
+        </Button>
+        <RoomSettings room={room} />
+        {room.status === "FINISHED" && (
+          <Link
+            to={`/rooms/${room.id}/result`}
+            className="block rounded-2xl bg-[#eee9ff] p-4 text-center text-sm font-bold text-[#6c4cff]"
           >
-            <Send className="size-5" aria-hidden="true" />
-            {isSubmitting
-              ? "사진을 제출하고 있어요..."
-              : canTakePhoto
-                ? "이 사진 제출하기"
-                : "내 차례를 기다려주세요"}
-          </Button>
+            결과 화면으로
+          </Link>
         )}
       </div>
     </>

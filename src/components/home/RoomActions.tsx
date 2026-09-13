@@ -1,110 +1,194 @@
 import { Plus, TicketCheck } from "lucide-react";
 import { useState, type FormEvent } from "react";
+import type { CreateRoomRequest } from "../../types/room";
 import { Button } from "../common/Button";
-import { Card } from "../common/Card";
-
-const INVITATION_CODE_MAX_LENGTH = 12;
+import { Modal } from "../common/Modal";
 
 interface RoomActionsProps {
   isCreating: boolean;
   isJoining: boolean;
-  onCreate: (title: string) => void;
-  onJoin: (invitationCode: string) => void;
+  createError?: string;
+  joinError?: string;
+  onCreate: (request: CreateRoomRequest) => Promise<void>;
+  onJoin: (invitationCode: string) => Promise<void>;
+  onReset: () => void;
 }
+
+const inputClass =
+  "mt-2 min-h-12 w-full rounded-xl border border-[#ded8f2] bg-white px-3 text-sm outline-none focus:border-[#6c4cff]";
 
 export function RoomActions({
   isCreating,
   isJoining,
+  createError,
+  joinError,
   onCreate,
   onJoin,
+  onReset,
 }: RoomActionsProps) {
+  const [mode, setMode] = useState<"create" | "join" | null>(null);
   const [roomTitle, setRoomTitle] = useState("");
   const [invitationCode, setInvitationCode] = useState("");
-
-  const handleCreate = (event: FormEvent<HTMLFormElement>) => {
+  const [maxParticipants, setMaxParticipants] = useState(6);
+  const [timeLimitSeconds, setTimeLimitSeconds] = useState(60);
+  const [relayCount, setRelayCount] = useState(3);
+  const [isPublic, setIsPublic] = useState(true);
+  const isBusy = isCreating || isJoining;
+  const open = (next: "create" | "join") => {
+    onReset();
+    setMode(next);
+  };
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const title = roomTitle.trim();
-    if (title) {
-      onCreate(title);
+    if (isBusy) return;
+    try {
+      if (mode === "create") {
+        if (!roomTitle.trim()) return;
+        await onCreate({
+          title: roomTitle.trim(),
+          maxParticipants,
+          timeLimitSeconds,
+          relayCount,
+          isPublic,
+        });
+      } else {
+        if (!invitationCode.trim()) return;
+        await onJoin(invitationCode.trim());
+      }
+      setMode(null);
+    } catch {
+      /* Mutation errors remain visible in the modal. */
     }
   };
-
-  const handleJoin = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const code = invitationCode.trim().toUpperCase();
-    if (code) {
-      onJoin(code);
-    }
-  };
-
   return (
-    <section className="space-y-3 px-5" aria-labelledby="room-actions-title">
-      <h2 id="room-actions-title" className="text-base font-black text-[#342953]">
-        게임 시작하기
-      </h2>
-      <Card className="bg-gradient-to-br from-[#f0ebff] to-white">
-        <div className="flex items-center gap-3">
-          <span className="grid size-11 place-items-center rounded-2xl bg-[#6c4cff] text-white">
-            <Plus className="size-5" aria-hidden="true" />
-          </span>
-          <div>
-            <h3 className="text-sm font-black text-[#342953]">새 게임방 만들기</h3>
-            <p className="mt-0.5 text-xs text-[#8b85a8]">
-              친구를 초대할 방을 만들어요.
+    <section className="px-5" aria-label="게임방 만들기와 참여">
+      <div className="grid grid-cols-2 gap-3">
+        <Button
+          onClick={() => open("create")}
+          className="gap-1 whitespace-nowrap px-2 text-sm"
+        >
+          <Plus className="size-4" aria-hidden="true" />새 게임방
+        </Button>
+        <Button
+          onClick={() => open("join")}
+          variant="secondary"
+          className="gap-1 whitespace-nowrap px-2 text-sm"
+        >
+          <TicketCheck className="size-4" aria-hidden="true" />
+          초대 코드 참여
+        </Button>
+      </div>
+      <Modal
+        isOpen={mode !== null}
+        title={mode === "create" ? "새 게임방 만들기" : "초대 코드로 참여"}
+        onClose={() => setMode(null)}
+        isBusy={isBusy}
+      >
+        <form onSubmit={(event) => void handleSubmit(event)} className="space-y-4">
+          <fieldset disabled={isBusy} className="space-y-4 disabled:opacity-60">
+            {mode === "create" ? (
+              <>
+                <label className="block text-xs font-bold">
+                  방 이름
+                  <input
+                    className={inputClass}
+                    value={roomTitle}
+                    onChange={(event) => setRoomTitle(event.target.value)}
+                    maxLength={100}
+                    required
+                    placeholder="친구들과 함께할 릴레이"
+                  />
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <label className="text-xs font-bold">
+                    최대 인원
+                    <input
+                      type="number"
+                      min={2}
+                      max={10}
+                      required
+                      className={inputClass}
+                      value={maxParticipants}
+                      onChange={(event) =>
+                        setMaxParticipants(event.target.valueAsNumber)
+                      }
+                    />
+                  </label>
+                  <label className="text-xs font-bold">
+                    릴레이 횟수
+                    <input
+                      type="number"
+                      min={1}
+                      max={100}
+                      required
+                      className={inputClass}
+                      value={relayCount}
+                      onChange={(event) => setRelayCount(event.target.valueAsNumber)}
+                    />
+                  </label>
+                </div>
+                <label className="block text-xs font-bold">
+                  턴 제한 시간 (초)
+                  <input
+                    type="number"
+                    min={10}
+                    max={600}
+                    required
+                    className={inputClass}
+                    value={timeLimitSeconds}
+                    onChange={(event) =>
+                      setTimeLimitSeconds(event.target.valueAsNumber)
+                    }
+                  />
+                </label>
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={isPublic}
+                    onChange={(event) => setIsPublic(event.target.checked)}
+                    className="size-4 accent-[#6c4cff]"
+                  />
+                  공개 목록에 표시
+                </label>
+              </>
+            ) : (
+              <>
+                <p className="text-sm leading-6 text-[#8b85a8]">
+                  친구에게 받은 초대 코드를 그대로 붙여넣어 주세요.
+                </p>
+                <label className="block text-xs font-bold">
+                  초대 코드
+                  <input
+                    className={inputClass + " font-mono"}
+                    value={invitationCode}
+                    onChange={(event) => setInvitationCode(event.target.value)}
+                    maxLength={20}
+                    required
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck={false}
+                    placeholder="예: b3fec712345678d2"
+                  />
+                </label>
+              </>
+            )}
+          </fieldset>
+          {(mode === "create" ? createError : joinError) && (
+            <p role="alert" className="text-sm text-[#d93f75]">
+              {mode === "create" ? createError : joinError}
             </p>
-          </div>
-        </div>
-        <form className="mt-4 flex gap-2" onSubmit={handleCreate}>
-          <input
-            value={roomTitle}
-            onChange={(event) => setRoomTitle(event.target.value)}
-            placeholder="방 이름"
-            aria-label="방 이름"
-            maxLength={30}
-            className="min-w-0 flex-1 rounded-xl border border-[#ded8f2] bg-white px-3 text-sm outline-none focus:border-[#6c4cff]"
-          />
+          )}
           <Button
             type="submit"
-            disabled={!roomTitle.trim() || isCreating}
-            className="px-4"
+            fullWidth
+            disabled={
+              isBusy || !(mode === "create" ? roomTitle.trim() : invitationCode.trim())
+            }
           >
-            {isCreating ? "생성 중" : "만들기"}
+            {isBusy ? "처리 중..." : mode === "create" ? "방 만들기" : "참여하기"}
           </Button>
         </form>
-      </Card>
-
-      <Card>
-        <div className="flex items-center gap-3">
-          <span className="grid size-11 place-items-center rounded-2xl bg-[#ffe1eb] text-[#d93f75]">
-            <TicketCheck className="size-5" aria-hidden="true" />
-          </span>
-          <div>
-            <h3 className="text-sm font-black text-[#342953]">초대 코드로 참여</h3>
-            <p className="mt-0.5 text-xs text-[#8b85a8]">
-              받은 코드를 입력해 바로 입장해요.
-            </p>
-          </div>
-        </div>
-        <form className="mt-4 flex gap-2" onSubmit={handleJoin}>
-          <input
-            value={invitationCode}
-            onChange={(event) => setInvitationCode(event.target.value.toUpperCase())}
-            placeholder="예: RELAY7"
-            aria-label="초대 코드"
-            maxLength={INVITATION_CODE_MAX_LENGTH}
-            autoCapitalize="characters"
-            className="min-w-0 flex-1 rounded-xl border border-[#ded8f2] bg-white px-3 text-sm font-bold tracking-widest uppercase outline-none focus:border-[#6c4cff]"
-          />
-          <Button
-            type="submit"
-            variant="secondary"
-            disabled={!invitationCode.trim() || isJoining}
-            className="px-4"
-          >
-            {isJoining ? "입장 중" : "참여"}
-          </Button>
-        </form>
-      </Card>
+      </Modal>
     </section>
   );
 }

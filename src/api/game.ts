@@ -1,24 +1,4 @@
-import type { GameState, SubmitPhotoResponse } from "../types/game";
-import { api } from "./client";
-import { endpoints } from "./endpoints";
-
-export async function getGameState(roomId: string): Promise<GameState> {
-  const { data } = await api.get<GameState>(endpoints.game.state(roomId));
-  return data;
-}
-
-export async function submitGamePhoto(
-  roomId: string,
-  image: File,
-): Promise<SubmitPhotoResponse> {
-  const formData = new FormData();
-  formData.append("image", image);
-
-  const { data } = await api.post<SubmitPhotoResponse>(
-    endpoints.game.photo(roomId),
-    formData,
-    { headers: { "Content-Type": "multipart/form-data" } },
-  );
-
-  return data;
-}
+// Backend test has GamesService methods, but GamesController and GameRealtimeHandler
+// expose no start/state/turn/upload/finish entry points. Do not invent routes here.
+// See docs/backend-integration.md before enabling game actions.
+export const GAME_ACTIONS_AVAILABLE = false;

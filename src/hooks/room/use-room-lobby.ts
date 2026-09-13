@@ -1,37 +1,60 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMe } from "../use-me";
-import { useRoom, useStartGame, useUpdateReady } from "./use-rooms";
-
-const MINIMUM_PLAYERS_TO_START = 2;
+import { roomQueryKeys, useRoom } from "./use-rooms";
+import { useLobbySocket } from "../websocket/useLobbySocket";
 
 export function useRoomLobby(roomId: string) {
   const meQuery = useMe();
   const roomQuery = useRoom(roomId);
-  const readyMutation = useUpdateReady(roomId);
-  const startMutation = useStartGame(roomId);
-
-  const currentUserId = meQuery.data?.user?.id;
-  const currentPlayer = roomQuery.data?.players.find(
-    (player) => player.id === currentUserId,
+  const queryClient = useQueryClient();
+  const room = roomQuery.data;
+  const currentPlayer = room?.players.find(
+    (player) => player.id === meQuery.data?.user?.id,
   );
-  const otherPlayers = roomQuery.data?.players.filter((player) => !player.isHost) ?? [];
-  const isEveryPlayerReady = otherPlayers.every((player) => player.isReady);
-  const canStart = Boolean(
-    currentPlayer?.isHost &&
-    roomQuery.data &&
-    roomQuery.data.players.length >= MINIMUM_PLAYERS_TO_START &&
-    isEveryPlayerReady,
+  const socket = useLobbySocket(
+    Number(roomId),
+    Boolean(currentPlayer && room && ["WAITING", "READY"].includes(room.status)),
   );
-
+  const refresh = () => {
+    void queryClient.invalidateQueries({ queryKey: roomQueryKeys.all });
+  };
+  const readyMutation = useMutation({
+    mutationFn: socket.setReady,
+    onSettled: refresh,
+  });
+  const leaveMutation = useMutation({ mutationFn: socket.leave, onSuccess: refresh });
+  const updateMutation = useMutation({
+    mutationFn: socket.updateRoom,
+    onSettled: refresh,
+  });
+  const hostMutation = useMutation({
+    mutationFn: socket.changeHost,
+    onSettled: refresh,
+  });
+  const mutationError =
+    readyMutation.error ??
+    leaveMutation.error ??
+    updateMutation.error ??
+    hostMutation.error;
+  const isMutating =
+    readyMutation.isPending ||
+    leaveMutation.isPending ||
+    updateMutation.isPending ||
+    hostMutation.isPending;
   return {
-    canStart,
+    room,
     currentPlayer,
+    socket,
     isPending: meQuery.isPending || roomQuery.isPending,
-    room: roomQuery.data,
     roomError: roomQuery.error,
-    isReadyUpdating: readyMutation.isPending,
-    isStarting: startMutation.isPending,
     refetchRoom: roomQuery.refetch,
-    setReady: (isReady: boolean) => readyMutation.mutate(isReady),
-    startGame: startMutation.mutateAsync,
+    actionError: mutationError
+      ? mutationError.message || "요청을 처리하지 못했습니다."
+      : socket.error,
+    isMutating,
+    setReady: readyMutation.mutate,
+    leave: leaveMutation.mutateAsync,
+    updateRoom: updateMutation.mutateAsync,
+    changeHost: hostMutation.mutateAsync,
   };
 }

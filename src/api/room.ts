@@ -1,17 +1,23 @@
 import type {
   CreateRoomRequest,
   CreateRoomResponse,
-  JoinRoomRequest,
+  InviteResponse,
+  JoinByCodeResponse,
   JoinRoomResponse,
+  MyRoomSummary,
   Room,
   RoomSummary,
-  UpdateReadyRequest,
 } from "../types/room";
 import { api } from "./client";
 import { endpoints } from "./endpoints";
 
 export async function getRooms(): Promise<RoomSummary[]> {
   const { data } = await api.get<RoomSummary[]>(endpoints.room.list);
+  return data;
+}
+
+export async function getMyRooms(): Promise<MyRoomSummary[]> {
+  const { data } = await api.get<MyRoomSummary[]>(endpoints.room.mine);
   return data;
 }
 
@@ -27,19 +33,21 @@ export async function createRoom(
   return data;
 }
 
-export async function joinRoom(request: JoinRoomRequest): Promise<JoinRoomResponse> {
-  const { data } = await api.post<JoinRoomResponse>(endpoints.room.join, request);
+export async function joinRoom(roomId: number): Promise<JoinRoomResponse> {
+  const { data } = await api.post<JoinRoomResponse>(endpoints.room.join(roomId));
   return data;
 }
 
-export async function updateReady(
-  roomId: string,
-  request: UpdateReadyRequest,
-): Promise<Room> {
-  const { data } = await api.patch<Room>(endpoints.room.ready(roomId), request);
+export async function joinByInviteCode(
+  inviteCode: string,
+): Promise<JoinByCodeResponse> {
+  const { data } = await api.post<JoinByCodeResponse>(
+    endpoints.room.codeJoin(inviteCode.trim()),
+  );
   return data;
 }
 
-export async function startGame(roomId: string): Promise<void> {
-  await api.post(endpoints.room.start(roomId));
+export async function getInvite(roomId: number): Promise<InviteResponse> {
+  const { data } = await api.get<InviteResponse>(endpoints.room.invite(roomId));
+  return data;
 }

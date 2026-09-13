@@ -23,7 +23,10 @@ export function SignUpForm({ errorMessage, isPending, onSubmit }: SignUpFormProp
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-1 flex-col px-6 pb-6 pt-10">
+    <form
+      onSubmit={handleSubmit}
+      className="flex w-full flex-1 flex-col gap-1 px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[max(2.5rem,env(safe-area-inset-top))]"
+    >
       <div className="mx-auto grid size-16 place-items-center rounded-2xl bg-[#ebe5ff] text-3xl">
         👋
       </div>
@@ -53,7 +56,9 @@ export function SignUpForm({ errorMessage, isPending, onSubmit }: SignUpFormProp
         className="mt-2 min-h-14 rounded-2xl border border-[#ded8f2] bg-white px-4 text-[#2c2345] outline-none transition placeholder:text-[#bbb5cb] focus:border-[#6c4cff] focus:ring-4 focus:ring-[#6c4cff]/10"
       />
       <div className="mt-2 flex justify-between text-xs text-[#9c96ae]">
-        <span>{errorMessage ?? "친구들이 알아보기 쉬운 이름이 좋아요."}</span>
+        <span role={errorMessage ? "alert" : undefined}>
+          {errorMessage ?? "친구들이 알아보기 쉬운 이름이 좋아요."}
+        </span>
         <span>
           {nickname.length}/{MAX_NICKNAME_LENGTH}
         </span>
@@ -63,7 +68,7 @@ export function SignUpForm({ errorMessage, isPending, onSubmit }: SignUpFormProp
         type="submit"
         fullWidth
         disabled={!isValid || isPending}
-        className="mt-auto min-h-14"
+        className="mt-10 min-h-14"
       >
         {isPending ? "가입 처리 중..." : "사진 릴레이 시작하기"}
       </Button>

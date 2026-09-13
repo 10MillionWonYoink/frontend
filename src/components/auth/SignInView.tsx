@@ -9,16 +9,16 @@ interface SignInViewProps {
 }
 
 export function SignInView({
-                             onKakaoLogin,
-                             onDevLogin,
-                             isDevLoginPending,
-                           }: SignInViewProps) {
+  onKakaoLogin,
+  onDevLogin,
+  isDevLoginPending,
+}: SignInViewProps) {
   const [accountNumber, setAccountNumber] = useState(1);
 
   const isTestEnvironment = import.meta.env.VITE_APP_ENV === "test";
 
   return (
-    <div className="flex flex-1 flex-col justify-between px-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-14">
+    <div className="flex w-full flex-1 flex-col justify-between px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[max(3.5rem,env(safe-area-inset-top))]">
       <div className="flex flex-1 items-center justify-center py-8">
         <AuthIntro />
       </div>
@@ -36,6 +36,7 @@ export function SignInView({
         {isTestEnvironment && (
           <div className="mt-3 grid grid-cols-2 gap-2">
             <select
+              aria-label="테스트 계정"
               value={accountNumber}
               disabled={isDevLoginPending}
               className="min-h-14 w-full cursor-pointer rounded-2xl border-0 bg-[#eee9ff] px-4 text-center text-sm font-extrabold text-[#4d397d] outline-none transition hover:bg-[#e4ddff] focus:ring-2 focus:ring-[#7657e8] disabled:cursor-wait disabled:opacity-60"

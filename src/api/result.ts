@@ -1,8 +1,3 @@
-import type { GameResult } from "../types/result";
-import { api } from "./client";
-import { endpoints } from "./endpoints";
-
-export async function getGameResult(roomId: string): Promise<GameResult> {
-  const { data } = await api.get<GameResult>(endpoints.result.detail(roomId));
-  return data;
-}
+// No result controller, photo URL lookup, or result event exists on Backend test.
+// Keep the result screen in its unavailable state until a contract is published.
+export const GAME_RESULTS_AVAILABLE = false;

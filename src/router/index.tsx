@@ -1,3 +1,4 @@
+import { InviteJoinContainer } from "../containers/InviteJoinContainer";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import HomePage from "../pages/Home/HomePage";
 import GamePage from "../pages/Relay/GamePage";
@@ -23,6 +24,7 @@ export const router = createBrowserRouter([
           { index: true, element: <HomePage /> },
           { path: "relay", element: <Navigate to="/" replace /> },
           { path: "result", element: <Navigate to="/" replace /> },
+          { path: "rooms/join/:inviteCode", element: <InviteJoinContainer /> },
           { path: "rooms/:roomId", element: <RoomPage /> },
           { path: "rooms/:roomId/game", element: <GamePage /> },
           { path: "rooms/:roomId/result", element: <ResultPage /> },
