@@ -50,7 +50,6 @@ api.interceptors.response.use(
     try {
       await refreshSession();
 
-      // 새 쿠키로 기존 API 다시 요청
       return api.request(originalRequest);
     } catch (refreshError) {
       return Promise.reject(refreshError);

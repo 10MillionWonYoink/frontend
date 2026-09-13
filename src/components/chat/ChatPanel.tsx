@@ -2,7 +2,6 @@ import { MessageCircle, Send } from "lucide-react";
 import { Button } from "../common/Button";
 import { Avatar } from "../common/Avatar";
 
-// UI models, not a proposed Backend DTO. A conversation can later represent a DM or a group.
 export interface ChatParticipant {
   id: number;
   nickname: string;

@@ -1,6 +1,5 @@
 const encodePathSegment = (value: string | number) => encodeURIComponent(String(value));
 
-// Only routes exposed by backend test (42ef6d5).
 export const endpoints = {
   auth: { kakao: "/auth/kakao", me: "/auth/me", signup: "/auth/signup" },
   user: { devLogin: (accountNumber: number) => `/users/dev-login/${accountNumber}` },

@@ -17,7 +17,6 @@ export const router = createBrowserRouter([
     path: "/",
     element: <App />,
     children: [
-      // 로그인 사용자만 접근
       {
         element: <ProtectedRoute />,
         children: [
@@ -31,7 +30,6 @@ export const router = createBrowserRouter([
         ],
       },
 
-      // 비로그인 사용자만 접근
       {
         element: <PublicOnlyRoute />,
         children: [

@@ -1,5 +1,3 @@
-// Legacy presentation model only; no Backend API currently returns this shape.
-// Do not use this as an HTTP or Socket.IO response type. See docs/backend-integration.md.
 export type GameStatus =
   "WAITING" | "PLAYING" | "MY_TURN" | "OTHER_TURN" | "SUBMITTED" | "FINISHED";
 
