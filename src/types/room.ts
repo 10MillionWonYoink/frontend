@@ -9,6 +9,15 @@ export interface RoomPlayer {
   isHost: boolean;
 }
 
+export interface BackendRoomPlayer {
+  memberId: number;
+  userId: number;
+  nickname: string;
+  profileImageUrl: string | null;
+  isReady: boolean;
+  isHost: boolean;
+}
+
 export interface RoomSummary {
   id: number;
   title: string;
@@ -43,13 +52,32 @@ export interface RoomMember {
 }
 
 export interface Room extends RoomSummary {
-  room: BackendRoom;
-  members: RoomMember[];
+  hostId: number;
   hostName: string;
+  minPlayers: number;
+  isPublic: boolean;
   invitationCode: string;
   players: RoomPlayer[];
   turnSeconds: number;
   totalRounds: number;
+  updatedAt: string;
+}
+
+export interface BackendRoomDetailResponse {
+  id: number;
+  title: string;
+  status: BackendRoomStatus;
+  hostId: number;
+  hostName: string;
+  minPlayers: number;
+  maxPlayers: number;
+  currentPlayers: number;
+  isPublic: boolean;
+  invitationCode: string;
+  turnSeconds: number;
+  totalRounds: number;
+  players: BackendRoomPlayer[];
+  updatedAt: string;
 }
 
 export interface MyRoomSummary extends Omit<RoomSummary, "status"> {

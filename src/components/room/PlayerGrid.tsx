@@ -29,7 +29,13 @@ export function PlayerGrid({ players, title = "참여자" }: PlayerGridProps) {
               <Badge
                 tone={player.isHost ? "yellow" : player.isReady ? "mint" : "purple"}
               >
-                {player.isHost ? "방장" : player.isReady ? "준비 완료" : "대기 중"}
+                {player.isHost
+                  ? player.isReady
+                    ? "방장 · 준비 완료"
+                    : "방장"
+                  : player.isReady
+                    ? "준비 완료"
+                    : "대기 중"}
               </Badge>
             </div>
           </li>

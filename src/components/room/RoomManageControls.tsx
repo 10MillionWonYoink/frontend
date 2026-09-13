@@ -25,7 +25,7 @@ function SettingsForm({
   const [maxParticipants, setMaxParticipants] = useState(room.maxPlayers);
   const [timeLimitSeconds, setTimeLimitSeconds] = useState(room.turnSeconds);
   const [relayCount, setRelayCount] = useState(room.totalRounds);
-  const [isPublic, setIsPublic] = useState(room.room.isPublic);
+  const [isPublic, setIsPublic] = useState(room.isPublic);
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (isPending || !title.trim()) return;
@@ -62,7 +62,7 @@ function SettingsForm({
           <input
             required
             type="number"
-            min={Math.max(room.room.minParticipants, room.currentPlayers)}
+            min={Math.max(room.minPlayers, room.currentPlayers)}
             max={10}
             className={inputClass}
             value={maxParticipants}

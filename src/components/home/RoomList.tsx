@@ -9,6 +9,7 @@ interface RoomListProps {
   joinedIds: ReadonlySet<number>;
   pendingRoomId?: number;
   disabled?: boolean;
+  hasOtherActiveRoom?: boolean;
 }
 
 export function RoomList({
@@ -17,6 +18,7 @@ export function RoomList({
   joinedIds,
   pendingRoomId,
   disabled,
+  hasOtherActiveRoom,
 }: RoomListProps) {
   if (!rooms.length)
     return (
@@ -39,7 +41,9 @@ export function RoomList({
             <button
               type="button"
               onClick={() => onJoin(room.id)}
-              disabled={disabled || (!isJoined && !isAvailable)}
+              disabled={
+                disabled || (!isJoined && (!isAvailable || hasOtherActiveRoom))
+              }
               className="flex min-h-20 w-full items-center justify-between gap-3 rounded-2xl border border-[#e9e4f7] bg-white p-4 text-left transition hover:border-[#b9aaf8] disabled:opacity-60"
             >
               <div className="min-w-0 flex-1">

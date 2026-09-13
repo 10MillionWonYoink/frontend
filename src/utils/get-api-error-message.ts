@@ -5,15 +5,19 @@ interface ErrorResponse {
 }
 
 export function getApiErrorMessage(error: unknown, fallbackMessage: string): string {
-  if (!axios.isAxiosError<ErrorResponse>(error)) {
-    return fallbackMessage;
+  if (axios.isAxiosError<ErrorResponse>(error)) {
+    const message = error.response?.data.message;
+
+    if (Array.isArray(message)) {
+      return message.join(", ");
+    }
+
+    return message ?? fallbackMessage;
   }
 
-  const message = error.response?.data.message;
-
-  if (Array.isArray(message)) {
-    return message.join(", ");
+  if (error instanceof Error && error.message) {
+    return error.message;
   }
 
-  return message ?? fallbackMessage;
+  return fallbackMessage;
 }

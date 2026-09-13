@@ -1,4 +1,6 @@
 import type {
+  BackendRoomDetailResponse,
+  BackendRoomStatus,
   CreateRoomRequest,
   CreateRoomResponse,
   InviteResponse,
@@ -6,6 +8,7 @@ import type {
   JoinRoomResponse,
   MyRoomSummary,
   Room,
+  RoomStatus,
   RoomSummary,
 } from "../types/room";
 import { api } from "./client";
@@ -22,8 +25,43 @@ export async function getMyRooms(): Promise<MyRoomSummary[]> {
 }
 
 export async function getRoom(roomId: string): Promise<Room> {
-  const { data } = await api.get<Room>(endpoints.room.detail(roomId));
-  return data;
+  const { data } = await api.get<BackendRoomDetailResponse>(
+    endpoints.room.detail(roomId),
+  );
+
+  return {
+    id: data.id,
+    title: data.title,
+    status: mapRoomStatus(data.status),
+    hostId: data.hostId,
+    hostName: data.hostName,
+    minPlayers: data.minPlayers,
+    maxPlayers: data.maxPlayers,
+    currentPlayers: data.currentPlayers,
+    isPublic: data.isPublic,
+    invitationCode: data.invitationCode,
+    turnSeconds: data.turnSeconds,
+    totalRounds: data.totalRounds,
+    players: data.players.map((player) => ({
+      id: player.userId,
+      nickname: player.nickname,
+      avatar: player.profileImageUrl,
+      isReady: player.isReady,
+      isHost: player.isHost,
+    })),
+    updatedAt: data.updatedAt,
+  };
+}
+
+const roomStatusMap: Record<BackendRoomStatus, RoomStatus> = {
+  waiting: "WAITING",
+  countdown: "READY",
+  in_progress: "PLAYING",
+  finished: "FINISHED",
+};
+
+function mapRoomStatus(status: BackendRoomStatus): RoomStatus {
+  return roomStatusMap[status];
 }
 
 export async function createRoom(
