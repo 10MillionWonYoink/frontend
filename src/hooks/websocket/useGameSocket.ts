@@ -104,6 +104,9 @@ export function useGameSocket(gameId: number | undefined, enabled: boolean) {
               ?.nickname ?? "",
           startedAt: event.startedAt,
           expiresAt: event.expiresAt,
+          // Not included in this event; generated in the background and picked up
+          // by the game-session poll below once it lands.
+          topic: null,
         },
         turns: previous.turns.map((turn) =>
           turn.turnNumber === event.turnNumber

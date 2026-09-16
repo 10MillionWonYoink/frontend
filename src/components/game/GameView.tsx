@@ -88,7 +88,14 @@ export function GameView({
         </div>
       </header>
       <div className="flex-1 space-y-4 px-5 py-5">
-        <GameTopicSection topic={game.topic} />
+        {isMyTurn && currentTurn?.topic && (
+          <GameTopicSection title="나의 미션" topic={currentTurn.topic} />
+        )}
+        {isMyTurn && currentTurn && !currentTurn.topic && (
+          <FeatureNotice title="미션을 준비하고 있어요">
+            잠시 후 나만의 미션이 표시됩니다.
+          </FeatureNotice>
+        )}
         {game.status === "countdown" && (
           <FeatureNotice title="게임이 곧 시작해요">
             잠시 후 첫 번째 차례가 시작됩니다.

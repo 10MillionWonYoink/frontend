@@ -118,6 +118,11 @@ export function RoundResultList({
                         {TURN_STATUS_LABEL[turn.status]}
                       </Badge>
                     </div>
+                    {turn.topic && (
+                      <p className="mt-2 rounded-xl bg-[#eee9ff] px-3 py-2 text-[11px] font-bold text-[#6c4cff]">
+                        미션: {turn.topic}
+                      </p>
+                    )}
                     {turn.feedback && (
                       <p className="mt-2 rounded-xl bg-[#f1eef9] px-3 py-2 text-[11px] text-[#8b85a8]">
                         {turn.feedback}

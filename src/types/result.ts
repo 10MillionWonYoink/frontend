@@ -15,6 +15,8 @@ export interface GameResultTurn {
   status: GameTurnStatus;
   imageKey: string | null;
   submittedAt: string | null;
+  // Revealed for every turn only once the game has finished.
+  topic: string | null;
   score: number | null;
   feedback: string | null;
 }
