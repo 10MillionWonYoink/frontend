@@ -52,6 +52,7 @@ export interface RoomMember {
 }
 
 export interface Room extends RoomSummary {
+  id: number;
   hostId: number;
   hostName: string;
   minPlayers: number;

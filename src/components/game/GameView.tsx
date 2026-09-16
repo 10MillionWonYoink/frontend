@@ -9,12 +9,12 @@ import { FeatureNotice } from "../common/FeatureNotice";
 import { RoomSettings } from "../room/RoomSettings";
 import { GameTopicSection } from "../result/GameTopicSection";
 import { getRoomStatusLabel } from "../../utils/get-room-status-label";
-import { createPlaceholderImageKey } from "../../utils/create-placeholder-image-key";
 import { getApiErrorMessage } from "../../utils/get-api-error-message";
 import { Timer } from "./Timer";
 import { CameraPreview } from "./CameraPreview";
 import { useCountdown } from "../../hooks/game/use-countdown";
 import { usePhotoSelection } from "../../hooks/game/use-photo-selection";
+import { useUploadRoomPhoto } from "../../hooks/use-upload-room-photo.ts";
 
 interface GameViewProps {
   room: Room;
@@ -46,14 +46,28 @@ export function GameView({
   }, [expiresAt]);
   const remainingSeconds = useCountdown(initialSeconds, !currentTurn);
   const { previewUrl, selectedPhoto, selectPhoto } = usePhotoSelection();
+  const uploadMutation = useUploadRoomPhoto();
 
   const handleSubmit = async () => {
-    if (!selectedPhoto) return;
+    if (!selectedPhoto) {
+      return;
+    }
+
+    // null 검사 후 File 타입으로 확정
+    const photo = selectedPhoto;
+
     try {
-      await onSubmitTurn(createPlaceholderImageKey(selectedPhoto));
+      const { objectKey } =
+        await uploadMutation.mutateAsync({
+          roomId: room.id,
+          file: photo,
+        });
+
+      await onSubmitTurn(objectKey);
+
       selectPhoto(null);
-    } catch {
-      /* 제출 에러는 하단에 표시된다. */
+    } catch (error) {
+      console.error('사진 제출 실패:', error);
     }
   };
 
@@ -109,6 +123,13 @@ export function GameView({
                 >
                   {isSubmitting ? "제출 중..." : "사진 제출하기"}
                 </Button>
+                {uploadMutation.isError && (
+                  <p>
+                    {uploadMutation.error instanceof Error
+                      ? uploadMutation.error.message
+                      : '사진 업로드에 실패했습니다.'}
+                  </p>
+                )}
               </>
             ) : (
               <div className="flex min-h-64 flex-col items-center justify-center rounded-[1.75rem] bg-[#21173b] text-white/70">
