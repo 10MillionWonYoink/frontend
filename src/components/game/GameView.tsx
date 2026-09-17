@@ -93,7 +93,14 @@ export function GameView({
         </div>
       </header>
       <div className="flex-1 space-y-4 px-5 py-5">
-        <GameTopicSection topic={game.topic} />
+        {isMyTurn && currentTurn?.topic && (
+          <GameTopicSection title="나의 미션" topic={currentTurn.topic} />
+        )}
+        {isMyTurn && currentTurn && !currentTurn.topic && (
+          <FeatureNotice title="미션을 준비하고 있어요">
+            잠시 후 나만의 미션이 표시됩니다.
+          </FeatureNotice>
+        )}
         {game.status === "countdown" && (
           <FeatureNotice title="게임이 곧 시작해요">
             잠시 후 첫 번째 차례가 시작됩니다.
@@ -147,6 +154,18 @@ export function GameView({
                 <p className="mt-2 text-xs">차례가 되면 알려드릴게요.</p>
               </div>
             )}
+          </>
+        ) : game.status === "cancelled" ? (
+          <>
+            <FeatureNotice title="상대방이 게임을 나갔어요">
+              새로운 게임을 시작해보세요.
+            </FeatureNotice>
+            <Link
+              to="/"
+              className="block rounded-2xl bg-[#6c4cff] p-4 text-center text-sm font-bold text-white"
+            >
+              홈으로
+            </Link>
           </>
         ) : game.status === "finished" ? (
           <FeatureNotice title="게임이 종료되었어요">

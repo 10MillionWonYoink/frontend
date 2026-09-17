@@ -25,6 +25,8 @@ export interface CurrentGameTurn {
   nickname: string;
   startedAt: string;
   expiresAt: string;
+  // Backend redacts this to null unless the requester owns the turn.
+  topic: string | null;
 }
 
 export interface GameSessionState {

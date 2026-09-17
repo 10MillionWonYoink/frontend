@@ -17,11 +17,18 @@ export function useLatestGameByRoom(roomId: string | undefined) {
   });
 }
 
-export function useGameSessionQuery(gameId: number | undefined) {
+export function useGameSessionQuery(gameId: number | undefined, meUserId: number | undefined) {
   return useQuery({
     queryKey: gameQueryKeys.detail(gameId ?? 0),
     queryFn: () => getGameSession(gameId as number),
     enabled: Boolean(gameId),
+    // The turn's personal mission is generated in the background with no realtime
+    // event announcing completion; poll while it's my turn and still missing.
+    refetchInterval: (query) => {
+      const currentTurn = query.state.data?.currentTurn;
+      if (!currentTurn || meUserId === undefined) return false;
+      return currentTurn.userId === meUserId && !currentTurn.topic ? 2_000 : false;
+    },
   });
 }
 

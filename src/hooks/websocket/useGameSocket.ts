@@ -104,6 +104,9 @@ export function useGameSocket(gameId: number | undefined, enabled: boolean) {
               ?.nickname ?? "",
           startedAt: event.startedAt,
           expiresAt: event.expiresAt,
+          // Not included in this event; generated in the background and picked up
+          // by the game-session poll below once it lands.
+          topic: null,
         },
         turns: previous.turns.map((turn) =>
           turn.turnNumber === event.turnNumber
@@ -148,6 +151,20 @@ export function useGameSocket(gameId: number | undefined, enabled: boolean) {
       }));
       // The room's active-membership status (used by the 1-room-per-user policy on
       // Home) changes to finished here too, not just this room's own detail query.
+      void queryClient.invalidateQueries({
+        queryKey: roomQueryKeys.all,
+      });
+    });
+    socket.on("game:cancelled", (event) => {
+      if (event.gameId !== gameId) return;
+      patchGame((previous) => ({
+        ...previous,
+        status: "cancelled",
+        currentTurn: null,
+      }));
+      // Backend also sets Room.status to FINISHED when a game is cancelled by a
+      // mid-game leave, so refresh room queries the same way game:finished does
+      // (clears the 1-room-per-user active-room block for the remaining player).
       void queryClient.invalidateQueries({
         queryKey: roomQueryKeys.all,
       });
