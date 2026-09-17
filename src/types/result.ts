@@ -19,6 +19,7 @@ export interface GameResultTurn {
   topic: string | null;
   score: number | null;
   feedback: string | null;
+  imageUrl: string | null;
 }
 
 export interface GameResult {
