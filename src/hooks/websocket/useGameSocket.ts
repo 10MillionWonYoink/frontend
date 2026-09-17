@@ -155,6 +155,20 @@ export function useGameSocket(gameId: number | undefined, enabled: boolean) {
         queryKey: roomQueryKeys.all,
       });
     });
+    socket.on("game:cancelled", (event) => {
+      if (event.gameId !== gameId) return;
+      patchGame((previous) => ({
+        ...previous,
+        status: "cancelled",
+        currentTurn: null,
+      }));
+      // Backend also sets Room.status to FINISHED when a game is cancelled by a
+      // mid-game leave, so refresh room queries the same way game:finished does
+      // (clears the 1-room-per-user active-room block for the remaining player).
+      void queryClient.invalidateQueries({
+        queryKey: roomQueryKeys.all,
+      });
+    });
     socket.connect();
     return () => {
       active = false;

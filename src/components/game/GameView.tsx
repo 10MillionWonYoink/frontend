@@ -148,6 +148,18 @@ export function GameView({
               </div>
             )}
           </>
+        ) : game.status === "cancelled" ? (
+          <>
+            <FeatureNotice title="상대방이 게임을 나갔어요">
+              새로운 게임을 시작해보세요.
+            </FeatureNotice>
+            <Link
+              to="/"
+              className="block rounded-2xl bg-[#6c4cff] p-4 text-center text-sm font-bold text-white"
+            >
+              홈으로
+            </Link>
+          </>
         ) : game.status === "finished" ? (
           <FeatureNotice title="게임이 종료되었어요">
             최종 결과를 확인해보세요.

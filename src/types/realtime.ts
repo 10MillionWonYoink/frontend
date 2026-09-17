@@ -84,6 +84,13 @@ export interface GameFinishedEvent {
   roomId: number;
 }
 
+export interface GameCancelledEvent {
+  gameId: number;
+  roomId: number;
+  leftUserId: number;
+  reason: string;
+}
+
 export interface SubmitTurnResult {
   finished: boolean;
   gameId: number;
@@ -118,6 +125,7 @@ export interface ServerToClientEvents {
   "game:turn-submitted": (event: GameTurnSubmittedEvent) => void;
   "game:turn-expired": (event: GameTurnExpiredEvent) => void;
   "game:finished": (event: GameFinishedEvent) => void;
+  "game:cancelled": (event: GameCancelledEvent) => void;
   exception: (error: SocketFailure) => void;
 }
 export interface ClientToServerEvents {
