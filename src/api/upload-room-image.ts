@@ -11,9 +11,14 @@ interface CreateUploadUrlResponse {
   expiresIn: number;
 }
 
-interface UploadRoomImageParams {
+export interface UploadRoomImageParams {
   roomId: number;
   file: File;
+}
+
+export interface UploadRoomPhotoResponse {
+  objectKey: string;
+  eTag: string | null;
 }
 
 function isAllowedImageType(
@@ -29,9 +34,17 @@ function isAllowedImageType(
 export async function uploadRoomImage({
                                         roomId,
                                         file,
-                                      }: UploadRoomImageParams) {
+                                      }: UploadRoomImageParams): Promise<UploadRoomPhotoResponse> {
   if (!isAllowedImageType(file.type)) {
     throw new Error('지원하지 않는 이미지 형식입니다.');
+  }
+
+  if (file.size >  10 * 1024 * 1024) {
+    throw new Error('사진은 최대 10MB까지 업로드할 수 있습니다.');
+  }
+
+  if (file.size < 1) {
+    throw new Error('빈 파일은 업로드할 수 없습니다.');
   }
 
   // 백엔드에서 Presigned URL 발급
@@ -41,6 +54,7 @@ export async function uploadRoomImage({
       {
         roomId,
         contentType: file.type,
+        fileSize: file.size,
       },
     );
 

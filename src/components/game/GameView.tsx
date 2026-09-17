@@ -27,14 +27,14 @@ interface GameViewProps {
 }
 
 export function GameView({
-  room,
-  game,
-  meUserId,
-  socketStatus,
-  onSubmitTurn,
-  isSubmitting,
-  submitError,
-}: GameViewProps) {
+                           room,
+                           game,
+                           meUserId,
+                           socketStatus,
+                           onSubmitTurn,
+                           isSubmitting,
+                           submitError,
+                         }: GameViewProps) {
   const currentTurn = game.currentTurn;
   const isMyTurn = Boolean(
     currentTurn && meUserId !== undefined && currentTurn.userId === meUserId,
@@ -46,7 +46,12 @@ export function GameView({
   }, [expiresAt]);
   const remainingSeconds = useCountdown(initialSeconds, !currentTurn);
   const { previewUrl, selectedPhoto, selectPhoto } = usePhotoSelection();
-  const uploadMutation = useUploadRoomPhoto();
+  const {
+    mutateAsync: uploadMutation,
+    isPending,
+    isError,
+    error,
+  } = useUploadRoomPhoto();
 
   const handleSubmit = async () => {
     if (!selectedPhoto) {
@@ -58,7 +63,7 @@ export function GameView({
 
     try {
       const { objectKey } =
-        await uploadMutation.mutateAsync({
+        await uploadMutation({
           roomId: room.id,
           file: photo,
         });
@@ -67,7 +72,7 @@ export function GameView({
 
       selectPhoto(null);
     } catch (error) {
-      console.error('사진 제출 실패:', error);
+      console.error("사진 제출 실패:", error);
     }
   };
 
@@ -105,6 +110,7 @@ export function GameView({
             </div>
             {isMyTurn ? (
               <>
+                {isPending && <p>업로드 중입니다.</p>}
                 <CameraPreview
                   imageUrl={previewUrl}
                   isDisabled={isSubmitting}
@@ -116,23 +122,24 @@ export function GameView({
                   </p>
                 ) : null}
                 <Button
-                  disabled={!selectedPhoto || isSubmitting || socketStatus !== "open"}
+                  disabled={isPending || !selectedPhoto || isSubmitting || socketStatus !== "open"}
                   fullWidth
                   onClick={() => void handleSubmit()}
                   className="min-h-14"
                 >
                   {isSubmitting ? "제출 중..." : "사진 제출하기"}
                 </Button>
-                {uploadMutation.isError && (
+                {isError && (
                   <p>
-                    {uploadMutation.error instanceof Error
-                      ? uploadMutation.error.message
-                      : '사진 업로드에 실패했습니다.'}
+                    {error instanceof Error
+                      ? error.message
+                      : "사진 업로드에 실패했습니다."}
                   </p>
                 )}
               </>
             ) : (
-              <div className="flex min-h-64 flex-col items-center justify-center rounded-[1.75rem] bg-[#21173b] text-white/70">
+              <div
+                className="flex min-h-64 flex-col items-center justify-center rounded-[1.75rem] bg-[#21173b] text-white/70">
                 <Camera className="size-12" aria-hidden="true" />
                 <p className="mt-4 text-sm font-bold">
                   {currentTurn.nickname}님이 촬영 중이에요

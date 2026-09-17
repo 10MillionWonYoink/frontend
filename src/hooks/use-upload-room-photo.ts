@@ -1,8 +1,12 @@
 import { useMutation } from '@tanstack/react-query';
-import { uploadRoomImage } from '../api/upload-room-image';
+import { uploadRoomImage, type UploadRoomImageParams, type UploadRoomPhotoResponse } from "../api/upload-room-image.ts";
 
 export function useUploadRoomPhoto() {
-  return useMutation({
+  return useMutation<
+    UploadRoomPhotoResponse,
+    Error,
+    UploadRoomImageParams
+  >({
     mutationFn: uploadRoomImage,
   });
 }
