@@ -21,20 +21,22 @@ interface GameViewProps {
   game: GameSessionState;
   meUserId: number | undefined;
   socketStatus: string;
+  playerLeftNotice: { nickname: string; remainingParticipants: number } | null;
   onSubmitTurn: (imageKey: string) => Promise<unknown>;
   isSubmitting: boolean;
   submitError: unknown;
 }
 
 export function GameView({
-                           room,
-                           game,
-                           meUserId,
-                           socketStatus,
-                           onSubmitTurn,
-                           isSubmitting,
-                           submitError,
-                         }: GameViewProps) {
+  room,
+  game,
+  meUserId,
+  socketStatus,
+  playerLeftNotice,
+  onSubmitTurn,
+  isSubmitting,
+  submitError,
+}: GameViewProps) {
   const currentTurn = game.currentTurn;
   const isMyTurn = Boolean(
     currentTurn && meUserId !== undefined && currentTurn.userId === meUserId,
@@ -46,12 +48,7 @@ export function GameView({
   }, [expiresAt]);
   const remainingSeconds = useCountdown(initialSeconds, !currentTurn);
   const { previewUrl, selectedPhoto, selectPhoto } = usePhotoSelection();
-  const {
-    mutateAsync: uploadMutation,
-    isPending,
-    isError,
-    error,
-  } = useUploadRoomPhoto();
+  const uploadMutation = useUploadRoomPhoto();
 
   const handleSubmit = async () => {
     if (!selectedPhoto) {
@@ -63,7 +60,7 @@ export function GameView({
 
     try {
       const { objectKey } =
-        await uploadMutation({
+        await uploadMutation.mutateAsync({
           roomId: room.id,
           file: photo,
         });
@@ -72,7 +69,7 @@ export function GameView({
 
       selectPhoto(null);
     } catch (error) {
-      console.error("사진 제출 실패:", error);
+      console.error('사진 제출 실패:', error);
     }
   };
 
@@ -93,6 +90,11 @@ export function GameView({
         </div>
       </header>
       <div className="flex-1 space-y-4 px-5 py-5">
+        {playerLeftNotice && (
+          <FeatureNotice title={`${playerLeftNotice.nickname}님이 게임을 나갔어요`}>
+            게임은 계속 진행됩니다. (남은 인원 {playerLeftNotice.remainingParticipants}명)
+          </FeatureNotice>
+        )}
         {isMyTurn && currentTurn?.topic && (
           <GameTopicSection title="나의 미션" topic={currentTurn.topic} />
         )}
@@ -117,7 +119,6 @@ export function GameView({
             </div>
             {isMyTurn ? (
               <>
-                {isPending && <p>업로드 중입니다.</p>}
                 <CameraPreview
                   imageUrl={previewUrl}
                   isDisabled={isSubmitting}
@@ -129,24 +130,23 @@ export function GameView({
                   </p>
                 ) : null}
                 <Button
-                  disabled={isPending || !selectedPhoto || isSubmitting || socketStatus !== "open"}
+                  disabled={!selectedPhoto || isSubmitting || socketStatus !== "open"}
                   fullWidth
                   onClick={() => void handleSubmit()}
                   className="min-h-14"
                 >
                   {isSubmitting ? "제출 중..." : "사진 제출하기"}
                 </Button>
-                {isError && (
+                {uploadMutation.isError && (
                   <p>
-                    {error instanceof Error
-                      ? error.message
-                      : "사진 업로드에 실패했습니다."}
+                    {uploadMutation.error instanceof Error
+                      ? uploadMutation.error.message
+                      : '사진 업로드에 실패했습니다.'}
                   </p>
                 )}
               </>
             ) : (
-              <div
-                className="flex min-h-64 flex-col items-center justify-center rounded-[1.75rem] bg-[#21173b] text-white/70">
+              <div className="flex min-h-64 flex-col items-center justify-center rounded-[1.75rem] bg-[#21173b] text-white/70">
                 <Camera className="size-12" aria-hidden="true" />
                 <p className="mt-4 text-sm font-bold">
                   {currentTurn.nickname}님이 촬영 중이에요
@@ -154,18 +154,6 @@ export function GameView({
                 <p className="mt-2 text-xs">차례가 되면 알려드릴게요.</p>
               </div>
             )}
-          </>
-        ) : game.status === "cancelled" ? (
-          <>
-            <FeatureNotice title="상대방이 게임을 나갔어요">
-              새로운 게임을 시작해보세요.
-            </FeatureNotice>
-            <Link
-              to="/"
-              className="block rounded-2xl bg-[#6c4cff] p-4 text-center text-sm font-bold text-white"
-            >
-              홈으로
-            </Link>
           </>
         ) : game.status === "finished" ? (
           <FeatureNotice title="게임이 종료되었어요">

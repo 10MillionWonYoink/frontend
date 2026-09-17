@@ -36,6 +36,7 @@ export function GameContainer() {
       game={session.game}
       meUserId={meQuery.data?.user?.id}
       socketStatus={session.socketStatus}
+      playerLeftNotice={session.playerLeftNotice}
       onSubmitTurn={session.submitTurn}
       isSubmitting={session.isSubmitting}
       submitError={session.submitError}

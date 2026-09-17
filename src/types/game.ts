@@ -1,4 +1,4 @@
-export type GameSessionStatus = "countdown" | "in_progress" | "finished" | "cancelled";
+export type GameSessionStatus = "countdown" | "in_progress" | "finished";
 export type GameTurnStatus = "waiting" | "in_progress" | "submitted" | "expired";
 
 export interface LatestGame {

@@ -19,6 +19,10 @@ export function useGameSocket(gameId: number | undefined, enabled: boolean) {
   const subscribedRef = useRef(false);
   const [status, setStatus] = useState<RealtimeStatus>("idle");
   const [error, setError] = useState<string | null>(null);
+  const [playerLeftNotice, setPlayerLeftNotice] = useState<{
+    nickname: string;
+    remainingParticipants: number;
+  } | null>(null);
 
   useEffect(() => {
     if (!enabled || !gameId || !Number.isSafeInteger(gameId) || gameId <= 0) return;
@@ -29,6 +33,7 @@ export function useGameSocket(gameId: number | undefined, enabled: boolean) {
     subscribedRef.current = false;
     setStatus("connecting");
     setError(null);
+    setPlayerLeftNotice(null);
 
     const patchGame = (updater: (previous: GameSessionState) => GameSessionState) => {
       queryClient.setQueryData<GameSessionState>(
@@ -114,6 +119,9 @@ export function useGameSocket(gameId: number | undefined, enabled: boolean) {
             : turn,
         ),
       }));
+      // A new turn starting means the game has visibly moved past whichever
+      // departure (if any) preceded it, including a leave-triggered skip.
+      setPlayerLeftNotice(null);
     });
     socket.on("game:turn-submitted", (event) => {
       if (event.gameId !== gameId) return;
@@ -149,24 +157,29 @@ export function useGameSocket(gameId: number | undefined, enabled: boolean) {
         status: "finished",
         currentTurn: null,
       }));
+      setPlayerLeftNotice(null);
       // The room's active-membership status (used by the 1-room-per-user policy on
       // Home) changes to finished here too, not just this room's own detail query.
       void queryClient.invalidateQueries({
         queryKey: roomQueryKeys.all,
       });
     });
-    socket.on("game:cancelled", (event) => {
+    // Fired when a player leaves mid-game but the game continues (2+ players
+    // remain) — their unplayed turns are skipped (EXPIRED) server-side via the
+    // normal game:turn-started/game:turn-expired events, this is purely
+    // informational. If the leave instead drops the room to 1 player, the
+    // backend finishes the game directly and this event is not sent.
+    socket.on("game:player-left", (event) => {
       if (event.gameId !== gameId) return;
-      patchGame((previous) => ({
-        ...previous,
-        status: "cancelled",
-        currentTurn: null,
-      }));
-      // Backend also sets Room.status to FINISHED when a game is cancelled by a
-      // mid-game leave, so refresh room queries the same way game:finished does
-      // (clears the 1-room-per-user active-room block for the remaining player).
-      void queryClient.invalidateQueries({
-        queryKey: roomQueryKeys.all,
+      const current = queryClient.getQueryData<GameSessionState>(
+        gameQueryKeys.detail(gameId),
+      );
+      const nickname =
+        current?.turns.find((turn) => turn.userId === event.leftUserId)
+          ?.nickname ?? "상대방";
+      setPlayerLeftNotice({
+        nickname,
+        remainingParticipants: event.remainingParticipants,
       });
     });
     socket.connect();
@@ -203,6 +216,7 @@ export function useGameSocket(gameId: number | undefined, enabled: boolean) {
   return {
     status: enabled ? status : "idle",
     error,
+    playerLeftNotice,
     submitTurn,
   };
 }

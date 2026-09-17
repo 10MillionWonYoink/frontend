@@ -8,8 +8,7 @@ export function useGameSession(roomId: string) {
   const gameId = latestGameQuery.data?.gameId;
   const meQuery = useMe();
   const gameQuery = useGameSessionQuery(gameId, meQuery.data?.user?.id);
-  const isFinished =
-    gameQuery.data?.status === "finished" || gameQuery.data?.status === "cancelled";
+  const isFinished = gameQuery.data?.status === "finished";
   const socket = useGameSocket(gameId, Boolean(gameId) && !isFinished);
   const submitMutation = useMutation({ mutationFn: socket.submitTurn });
 
@@ -18,6 +17,7 @@ export function useGameSession(roomId: string) {
     error: latestGameQuery.error ?? gameQuery.error,
     game: gameQuery.data,
     socketStatus: socket.status,
+    playerLeftNotice: socket.playerLeftNotice,
     submitTurn: submitMutation.mutateAsync,
     isSubmitting: submitMutation.isPending,
     submitError: submitMutation.error,
