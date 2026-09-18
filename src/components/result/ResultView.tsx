@@ -32,18 +32,6 @@ export function ResultView({ room, result }: { room: Room; result: GameResult })
           totalTurns={result.totalTurns}
           totalRounds={room.totalRounds}
         />
-        {result.turns.map((turn) => (
-          <div key={turn.turnNumber}>
-            {turn.imageUrl ? (
-              <img
-                src={turn.imageUrl}
-                alt={`${turn.nickname}님의 제출 사진`}
-              />
-            ) : (
-              <p>제출된 사진이 없습니다.</p>
-            )}
-          </div>
-        ))}
         <PlayerGrid players={room.players} title="현재 방 참여자" />
         <RoomSettings room={room} />
         <div className="sticky bottom-0 -mx-5 mt-2 border-t border-[#eeeaf8] bg-[#fbfaff] px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">

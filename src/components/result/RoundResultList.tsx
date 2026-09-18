@@ -1,4 +1,3 @@
-import { ChevronDown } from "lucide-react";
 import type { GameResultTurn } from "../../types/result";
 import { Avatar } from "../common/Avatar";
 import { Badge } from "../common/Badge";
@@ -49,95 +48,183 @@ interface RoundResultListProps {
 }
 
 export function RoundResultList({
-  turns,
-  totalTurns,
-  totalRounds,
-}: RoundResultListProps) {
+                                  turns,
+                                  totalTurns,
+                                  totalRounds,
+                                }: RoundResultListProps) {
   const groups = groupTurnsByRound(turns, totalTurns, totalRounds);
 
   return (
     <section aria-labelledby="result-photos">
-      <h2 id="result-photos" className="text-base font-black text-[#342953]">
+      <h2
+        id="result-photos"
+        className="text-base font-black text-[#342953]"
+      >
         우리의 사진 릴레이
       </h2>
-      <div className="mt-3 space-y-2">
+
+      <div className="mt-4 space-y-6">
         {groups.map((group) => {
           const submittedCount = group.turns.filter(
             (turn) => turn.status === "submitted",
           ).length;
+
           return (
-            <details
+            <section
               key={group.round}
-              className="group rounded-2xl border border-[#e9e4f7] bg-white"
-              open={group.round === 1}
+              aria-labelledby={`round-${group.round}`}
             >
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-2 p-3 text-sm font-extrabold text-[#342953]">
-                <span>{group.round}라운드</span>
-                <span className="flex items-center gap-2 text-xs font-bold text-[#8b85a8]">
-                  제출 {submittedCount}/{group.turns.length}
-                  <ChevronDown
-                    className="size-4 transition-transform group-open:rotate-180"
-                    aria-hidden="true"
-                  />
-                </span>
-              </summary>
-              <ul className="space-y-2 border-t border-[#eeeaf8] p-3 pt-2">
+              {/* 라운드 제목 */}
+              <header className="mb-3 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="h-5 w-1 rounded-full bg-[#6c4cff]" />
+
+                  <h3
+                    id={`round-${group.round}`}
+                    className="text-sm font-black text-[#342953]"
+                  >
+                    {group.round}라운드
+                  </h3>
+                </div>
+
+                <span className="rounded-full bg-[#eee9ff] px-2.5 py-1 text-[11px] font-bold text-[#6c4cff]">
+              제출 {submittedCount}/{group.turns.length}
+            </span>
+              </header>
+
+              <ul
+                className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {group.turns.map((turn) => (
                   <li
                     key={turn.turnNumber}
-                    className="rounded-2xl border border-[#e9e4f7] bg-white p-3"
+                    className="w-[82vw] max-w-[340px] shrink-0 snap-center overflow-hidden rounded-3xl border border-[#e9e4f7] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:w-[320px]"
                   >
-                    <div className="flex items-center gap-3">
-                      <span className="grid size-7 shrink-0 place-items-center text-sm font-black text-[#6c4cff]">
-                        {turn.turnNumber}
+                    {/* 제출 사진 */}
+                    {turn.imageUrl ? (
+                      <a
+                        href={turn.imageUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="group/image relative block aspect-[4/3] overflow-hidden bg-[#17131f] focus:outline-none focus:ring-2 focus:ring-[#6c4cff] focus:ring-inset"
+                        aria-label={`${turn.nickname}님의 제출 사진 원본 보기`}
+                      >
+                        {/* 여백을 채우는 흐린 배경 */}
+                        <img
+                          src={turn.imageUrl}
+                          alt=""
+                          aria-hidden="true"
+                          className="absolute inset-0 size-full scale-110 object-cover opacity-40 blur-2xl"
+                        />
+
+                        {/* 실제 사진 */}
+                        <img
+                          src={turn.imageUrl}
+                          alt={`${turn.nickname}님의 ${turn.turnNumber}번째 제출 사진`}
+                          loading="lazy"
+                          className="relative z-10 size-full object-contain transition-transform duration-300 group-hover/image:scale-[1.02]"
+                        />
+
+                        {/* 턴 번호 */}
+                        <span
+                          className="absolute left-3 top-3 z-20 rounded-full bg-black/55 px-3 py-1.5 text-xs font-black text-white backdrop-blur-sm">
+                      TURN {turn.turnNumber}
+                    </span>
+
+                        {/* 점수 */}
+                        {turn.score !== null && (
+                          <span
+                            className="absolute right-3 top-3 z-20 rounded-full bg-[#6c4cff]/90 px-3 py-1.5 text-xs font-black text-white shadow-sm backdrop-blur-sm">
+                        {turn.score}점
                       </span>
-                      <Avatar
-                        imageUrl={turn.profileImageUrl}
-                        nickname={turn.nickname}
-                        size="small"
-                      />
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-extrabold text-[#342953]">
-                          {turn.nickname}
-                        </p>
-                        <p className="truncate text-[11px] text-[#8b85a8]">
-                          {turn.submittedAt
-                            ? new Date(turn.submittedAt).toLocaleTimeString("ko-KR", {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })
-                            : "-"}
-                        </p>
+                        )}
+                      </a>
+                    ) : (
+                      <div className="relative grid aspect-[4/3] place-items-center bg-[#f5f2fb]">
+                    <span
+                      className="absolute left-3 top-3 rounded-full bg-[#ded8ec] px-3 py-1.5 text-xs font-black text-[#756e8d]">
+                      TURN {turn.turnNumber}
+                    </span>
+
+                        <div className="text-center">
+                          <div
+                            className="mx-auto grid size-12 place-items-center rounded-full bg-white text-xl shadow-sm">
+                            📷
+                          </div>
+
+                          <p className="mt-3 text-sm font-extrabold text-[#8b85a8]">
+                            제출된 사진이 없습니다
+                          </p>
+
+                          <p className="mt-1 text-[11px] text-[#aaa4bd]">
+                            이 턴은 사진 없이 종료되었습니다.
+                          </p>
+                        </div>
                       </div>
-                      {turn.score !== null && (
-                        <strong className="text-sm font-black text-[#6c4cff]">
-                          {turn.score}점
-                        </strong>
+                    )}
+
+                    {/* 사용자 및 제출 정보 */}
+                    <div className="p-4">
+                      <div className="flex items-center gap-3">
+                        <Avatar
+                          imageUrl={turn.profileImageUrl}
+                          nickname={turn.nickname}
+                          size="small"
+                        />
+
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-extrabold text-[#342953]">
+                            {turn.nickname}
+                          </p>
+
+                          <p className="text-[11px] text-[#8b85a8]">
+                            {turn.submittedAt
+                              ? new Date(turn.submittedAt).toLocaleTimeString(
+                                "ko-KR",
+                                {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                },
+                              )
+                              : "제출 시간 없음"}
+                          </p>
+                        </div>
+
+                        <Badge tone={turnBadgeTone(turn.status)}>
+                          {TURN_STATUS_LABEL[turn.status]}
+                        </Badge>
+                      </div>
+
+                      {turn.topic && (
+                        <div className="mt-3 rounded-2xl bg-[#eee9ff] px-3 py-2.5">
+                          <p className="text-[10px] font-extrabold text-[#8f79ef]">
+                            이번 미션
+                          </p>
+
+                          <p className="mt-0.5 text-sm font-bold text-[#6c4cff]">
+                            {turn.topic}
+                          </p>
+                        </div>
                       )}
-                      <Badge tone={turnBadgeTone(turn.status)}>
-                        {TURN_STATUS_LABEL[turn.status]}
-                      </Badge>
+
+                      {turn.feedback && (
+                        <div className="mt-2 rounded-2xl bg-[#f4f2f9] px-3 py-2.5">
+                          <p className="text-[10px] font-extrabold text-[#8b85a8]">
+                            AI 평가
+                          </p>
+
+                          <p className="mt-1 whitespace-pre-line text-xs leading-5 text-[#625b79]">
+                            {turn.feedback}
+                          </p>
+                        </div>
+                      )}
                     </div>
-                    {turn.topic && (
-                      <p className="mt-2 rounded-xl bg-[#eee9ff] px-3 py-2 text-[11px] font-bold text-[#6c4cff]">
-                        미션: {turn.topic}
-                      </p>
-                    )}
-                    {turn.feedback && (
-                      <p className="mt-2 rounded-xl bg-[#f1eef9] px-3 py-2 text-[11px] text-[#8b85a8]">
-                        {turn.feedback}
-                      </p>
-                    )}
                   </li>
                 ))}
               </ul>
-            </details>
+            </section>
           );
         })}
       </div>
-      <p className="mt-3 text-[11px] text-[#8b85a8]">
-        사진 보기 기능은 준비 중이에요. 지금은 제출 여부만 확인할 수 있어요.
-      </p>
     </section>
   );
 }
