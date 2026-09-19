@@ -63,17 +63,16 @@ export function GameView({
     const photo = selectedPhoto;
 
     try {
-      const { objectKey } =
-        await uploadMutation.mutateAsync({
-          roomId: room.id,
-          file: photo,
-        });
+      const { objectKey } = await uploadMutation.mutateAsync({
+        roomId: room.id,
+        file: photo,
+      });
 
       await onSubmitTurn(objectKey);
 
       selectPhoto(null);
     } catch (error) {
-      console.error('사진 제출 실패:', error);
+      console.error("사진 제출 실패:", error);
     }
   };
 
@@ -96,7 +95,8 @@ export function GameView({
       <div className="flex-1 space-y-4 px-5 py-5">
         {playerLeftNotice && (
           <FeatureNotice title={`${playerLeftNotice.nickname}님이 게임을 나갔어요`}>
-            게임은 계속 진행됩니다. (남은 인원 {playerLeftNotice.remainingParticipants}명)
+            게임은 계속 진행됩니다. (남은 인원 {playerLeftNotice.remainingParticipants}
+            명)
           </FeatureNotice>
         )}
         {isMyTurn && currentTurn?.topic && (
@@ -130,7 +130,10 @@ export function GameView({
                 />
                 {uploadMutation.isError && (
                   <p role="alert" className="text-sm text-[#d93f75]">
-                    {getApiErrorMessage(uploadMutation.error, "사진을 업로드하지 못했습니다.")}
+                    {getApiErrorMessage(
+                      uploadMutation.error,
+                      "사진을 업로드하지 못했습니다.",
+                    )}
                   </p>
                 )}
                 {submitError ? (
