@@ -26,36 +26,40 @@ export function FinalRankingSection({
           점수와 순위는 아직 제공되지 않아요.
         </p>
       ) : (
-        <ul className="mt-3 space-y-2">
-          {ranking.map((entry) => (
-            <li
-              key={entry.userId}
-              className="flex items-center gap-3 rounded-2xl border border-[#e9e4f7] bg-white p-4"
-            >
-              <span className="grid size-9 shrink-0 place-items-center text-base font-black text-[#6c4cff]">
-                {entry.rank <= 3 ? (
-                  <Medal className="size-6" aria-label={`${entry.rank}위`} />
-                ) : (
-                  entry.rank
-                )}
-              </span>
-              <p className="min-w-0 flex-1 truncate text-sm font-extrabold text-[#342953]">
-                {entry.nickname}
-              </p>
-              <div className="shrink-0 text-right">
-                <p>
-                  <span className="text-2xl font-black text-[#6c4cff]">
+        <>
+          <p className="mt-1 text-[11px] text-[#8b85a8]">
+            제출 사진 평균 점수 기준
+          </p>
+          <ul className="mt-2.5 space-y-2">
+            {ranking.map((entry) => (
+              <li
+                key={entry.userId}
+                className={`flex items-center gap-3 rounded-2xl border p-3 ${
+                  entry.rank === 1
+                    ? "border-[#f5cf7a] bg-[#fff8e8]"
+                    : "border-[#e9e4f7] bg-white"
+                }`}
+              >
+                <span className="grid size-8 shrink-0 place-items-center text-sm font-black text-[#6c4cff]">
+                  {entry.rank <= 3 ? (
+                    <Medal className="size-5" aria-label={`${entry.rank}위`} />
+                  ) : (
+                    entry.rank
+                  )}
+                </span>
+                <p className="min-w-0 flex-1 truncate text-sm font-extrabold text-[#342953]">
+                  {entry.nickname}
+                </p>
+                <p className="shrink-0">
+                  <span className="text-xl font-black text-[#6c4cff]">
                     {entry.totalScore}
                   </span>
-                  <span className="text-sm font-bold text-[#8b85a8]"> / 100점</span>
+                  <span className="text-xs font-bold text-[#8b85a8]"> / 100점</span>
                 </p>
-                <p className="text-[10px] font-bold text-[#8b85a8]">
-                  제출 사진 평균 점수
-                </p>
-              </div>
-            </li>
-          ))}
-        </ul>
+              </li>
+            ))}
+          </ul>
+        </>
       )}
     </section>
   );

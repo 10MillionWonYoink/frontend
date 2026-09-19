@@ -42,7 +42,7 @@ export function RoomList({
               type="button"
               onClick={() => onJoin(room.id)}
               disabled={disabled || (!isJoined && (!isAvailable || hasOtherActiveRoom))}
-              className="flex min-h-20 w-full items-center justify-between gap-3 rounded-2xl border border-[#e9e4f7] bg-white p-4 text-left transition hover:border-[#b9aaf8] disabled:opacity-60"
+              className="flex min-h-16 w-full items-center justify-between gap-3 rounded-2xl border border-[#e9e4f7] bg-white p-3.5 text-left transition hover:border-[#b9aaf8] disabled:opacity-60"
             >
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
@@ -51,24 +51,24 @@ export function RoomList({
                   </p>
                   {index === 0 && <Badge tone="pink">NEW</Badge>}
                 </div>
-                <p className="mt-2 flex items-center gap-1 text-xs text-[#8b85a8]">
-                  <Users className="size-3.5" aria-hidden="true" />
-                  {room.currentPlayers} / {room.maxPlayers}명
-                </p>
+                <div className="mt-1.5 flex items-center gap-2">
+                  <Badge tone={isAvailable ? "mint" : "purple"}>
+                    {getRoomStatusLabel(room.status)}
+                  </Badge>
+                  <span className="flex items-center gap-1 text-xs text-[#8b85a8]">
+                    <Users className="size-3.5" aria-hidden="true" />
+                    {room.currentPlayers} / {room.maxPlayers}명
+                  </span>
+                </div>
               </div>
-              <div className="flex shrink-0 flex-col items-end gap-2">
-                <Badge tone={isAvailable ? "mint" : "purple"}>
-                  {getRoomStatusLabel(room.status)}
-                </Badge>
-                <span className="flex items-center gap-1 text-xs font-bold text-[#6c4cff]">
-                  {pendingRoomId === room.id
-                    ? "입장 중..."
-                    : isJoined
-                      ? "돌아가기"
-                      : "참여하기"}
-                  <ArrowUpRight className="size-3" aria-hidden="true" />
-                </span>
-              </div>
+              <span className="flex shrink-0 items-center gap-1 text-xs font-bold text-[#6c4cff]">
+                {pendingRoomId === room.id
+                  ? "입장 중..."
+                  : isJoined
+                    ? "돌아가기"
+                    : "참여하기"}
+                <ArrowUpRight className="size-3" aria-hidden="true" />
+              </span>
             </button>
           </li>
         );

@@ -340,6 +340,9 @@ export function RoundResultList({
   );
 }
 
+// Backend's per-item scoring stays on its original scale (50/30/20); this only
+// converts the DISPLAYED number to a 100-point scale for readability. The
+// authoritative 총점 (turn.score) is never recomputed from this.
 function ScoreDetail({
   label,
   value,
@@ -349,12 +352,14 @@ function ScoreDetail({
   value: number;
   max: number;
 }) {
+  const normalized = Math.round((value / max) * 100);
+
   return (
     <div className="rounded-xl bg-white px-2 py-2 text-center">
       <p className="text-[9px] font-extrabold text-[#8b85a8]">{label}</p>
       <p className="mt-0.5 text-sm font-black text-[#342953]">
-        {value}
-        <span className="text-[10px] font-bold text-[#8b85a8]">/{max}</span>
+        {normalized}
+        <span className="text-[10px] font-bold text-[#8b85a8]"> / 100점</span>
       </p>
     </div>
   );
