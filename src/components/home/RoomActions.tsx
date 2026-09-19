@@ -77,9 +77,9 @@ export function RoomActions({
           onClick={() => open("join")}
           variant="secondary"
           fullWidth
-          className="gap-1.5 text-sm"
+          className="min-h-14 gap-1.5 text-base"
         >
-          <TicketCheck className="size-4" aria-hidden="true" />
+          <TicketCheck className="size-5" aria-hidden="true" />
           초대 코드 참여
         </Button>
       </div>
