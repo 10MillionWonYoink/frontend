@@ -1,5 +1,3 @@
-import { ChevronLeft } from "lucide-react";
-import { Link } from "react-router-dom";
 import type { GameResult } from "../../types/result";
 import { FinalRankingSection } from "../result/FinalRankingSection";
 import { RoundResultList } from "../result/RoundResultList";
@@ -17,13 +15,6 @@ export function GameHistoryDetailView({ result }: { result: GameResult }) {
 
   return (
     <div className="flex-1 space-y-5 bg-[#fbfaff] px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[max(1.25rem,env(safe-area-inset-top))]">
-      <Link
-        to="/history"
-        className="inline-flex items-center gap-1 text-xs font-bold text-[#8b85a8]"
-      >
-        <ChevronLeft className="size-3.5" aria-hidden="true" />
-        내 게임 기록
-      </Link>
       <div>
         <p className="text-lg font-black text-[#342953]">
           {result.roomTitle ?? "이름 없는 방"}

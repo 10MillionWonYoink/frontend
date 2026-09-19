@@ -4,7 +4,7 @@ import { HistoryContainer } from "../../containers/HistoryContainer";
 export default function HistoryPage() {
   return (
     <>
-      <AppHeader />
+      <AppHeader backTo={{ to: "/", label: "홈" }} />
       <HistoryContainer />
     </>
   );
