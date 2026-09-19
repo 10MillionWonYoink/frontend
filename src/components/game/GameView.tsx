@@ -170,7 +170,10 @@ export function GameView({
           </FeatureNotice>
         )}
         <RoomSettings room={room} />
-        {room.status === "FINISHED" && (
+        {/* Room은 재게임 정책상 게임이 끝나도 FINISHED에 머물지 않고 WAITING으로
+            돌아가므로(방 자체는 계속 살아있음), 결과 화면 진입 여부는 이 게임 세션
+            자체의 종료 상태로 판단해야 한다. */}
+        {game.status === "finished" && (
           <Link
             to={`/rooms/${room.id}/result`}
             className="block rounded-2xl bg-[#eee9ff] p-4 text-center text-sm font-bold text-[#6c4cff]"

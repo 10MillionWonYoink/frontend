@@ -1,4 +1,4 @@
-import { Home } from "lucide-react";
+import { Home, RotateCcw } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { Room } from "../../types/room";
 import type { GameResult } from "../../types/result";
@@ -29,13 +29,14 @@ export function ResultView({ room, result }: { room: Room; result: GameResult })
         <div className="grid grid-cols-2 gap-2">
           <Link
             to={`/rooms/${room.id}`}
-            className="inline-flex min-h-12 items-center justify-center rounded-2xl border border-[#ded8f2] bg-white text-sm font-bold text-[#3d335c]"
+            className="inline-flex min-h-12 items-center justify-center gap-1 rounded-2xl bg-[#6c4cff] text-sm font-bold text-white"
           >
-            방 정보 보기
+            <RotateCcw className="size-4" aria-hidden="true" />
+            한 번 더 하기
           </Link>
           <Link
             to="/"
-            className="inline-flex min-h-12 items-center justify-center gap-1 rounded-2xl bg-[#6c4cff] text-sm font-bold text-white"
+            className="inline-flex min-h-12 items-center justify-center gap-1 rounded-2xl border border-[#ded8f2] bg-white text-sm font-bold text-[#3d335c]"
           >
             <Home className="size-4" aria-hidden="true" />
             홈으로
