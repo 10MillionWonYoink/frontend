@@ -1,4 +1,5 @@
 import type { GameSessionState, LatestGame } from "../types/game";
+import type { GameHistoryPage } from "../types/result";
 import { api } from "./client";
 import { endpoints } from "./endpoints";
 
@@ -9,5 +10,15 @@ export async function getLatestGameByRoom(roomId: number): Promise<LatestGame> {
 
 export async function getGameSession(gameId: number): Promise<GameSessionState> {
   const { data } = await api.get<GameSessionState>(endpoints.game.detail(gameId));
+  return data;
+}
+
+export async function getMyGameHistory(params: {
+  limit: number;
+  offset: number;
+}): Promise<GameHistoryPage> {
+  const { data } = await api.get<GameHistoryPage>(endpoints.game.myHistory, {
+    params,
+  });
   return data;
 }

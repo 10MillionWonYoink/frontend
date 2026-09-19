@@ -65,6 +65,11 @@ export function useLobbySocket(roomId: number, enabled: boolean) {
           subscribedRef.current = true;
           setStatus("open");
           setError(null);
+          // The initial REST fetch (on mount) and this subscribe ack land at
+          // slightly different times; any lobby event fired in that gap (e.g.
+          // another member's leave/ready-change right as this client entered
+          // the room) would otherwise go unseen until the next 5s poll.
+          refreshRoom();
         })
         .catch((cause: unknown) => {
           if (!active) return;
