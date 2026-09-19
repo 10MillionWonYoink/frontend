@@ -1,5 +1,6 @@
 import type { BackendRoomPlayer, BackendRoomStatus } from "./room";
 import type { GameSessionState, GameSessionStatus } from "./game";
+import type { ChatMessage } from "./chat";
 
 export interface RoomUpdate {
   roomId: number;
@@ -126,6 +127,8 @@ export interface ServerToClientEvents {
   "game:turn-expired": (event: GameTurnExpiredEvent) => void;
   "game:finished": (event: GameFinishedEvent) => void;
   "game:player-left": (event: GamePlayerLeftEvent) => void;
+  "chat:global:message": (message: ChatMessage) => void;
+  "chat:room:message": (message: ChatMessage) => void;
   exception: (error: SocketFailure) => void;
 }
 export interface ClientToServerEvents {
@@ -160,5 +163,13 @@ export interface ClientToServerEvents {
   "game:turn:submit": (
     body: { gameId: number; imageKey: string },
     ack: (result: Acknowledgement & SubmitTurnResult) => void,
+  ) => void;
+  "chat:global:send": (
+    body: { content: string },
+    ack: (result: Acknowledgement & { message: ChatMessage }) => void,
+  ) => void;
+  "chat:room:send": (
+    body: { roomId: number; content: string },
+    ack: (result: Acknowledgement & { message: ChatMessage }) => void,
   ) => void;
 }

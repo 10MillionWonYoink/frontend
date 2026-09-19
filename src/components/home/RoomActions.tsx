@@ -63,26 +63,22 @@ export function RoomActions({
     }
   };
   return (
-    <section className="px-5" aria-label="게임방 만들기와 참여">
-      <div className="flex flex-col gap-3">
-        <Button
-          onClick={() => open("create")}
-          disabled={hasActiveRoom}
-          fullWidth
-          className="min-h-14 gap-1.5 text-base"
-        >
-          <Plus className="size-5" aria-hidden="true" />새 게임방
-        </Button>
-        <Button
-          onClick={() => open("join")}
-          variant="secondary"
-          fullWidth
-          className="min-h-14 gap-1.5 text-base"
-        >
-          <TicketCheck className="size-5" aria-hidden="true" />
-          초대 코드 참여
-        </Button>
-      </div>
+    <>
+      <Button
+        onClick={() => open("create")}
+        disabled={hasActiveRoom}
+        className="min-h-12 flex-1 gap-1 whitespace-nowrap px-2 text-xs"
+      >
+        <Plus className="size-3.5 shrink-0" aria-hidden="true" />새 게임방
+      </Button>
+      <Button
+        onClick={() => open("join")}
+        variant="secondary"
+        className="min-h-12 flex-1 gap-1 whitespace-nowrap px-2 text-xs"
+      >
+        <TicketCheck className="size-3.5 shrink-0" aria-hidden="true" />
+        초대 코드
+      </Button>
       <Modal
         isOpen={mode !== null}
         title={mode === "create" ? "새 게임방 만들기" : "초대 코드로 참여"}
@@ -194,6 +190,6 @@ export function RoomActions({
           </Button>
         </form>
       </Modal>
-    </section>
+    </>
   );
 }

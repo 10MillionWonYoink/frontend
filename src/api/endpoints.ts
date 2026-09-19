@@ -20,4 +20,8 @@ export const endpoints = {
     result: (gameId: number) => `/games/${encodePathSegment(gameId)}/result`,
     myHistory: "/games/my",
   },
+  chat: {
+    global: "/chat/global",
+    room: (roomId: number) => `/chat/rooms/${encodePathSegment(roomId)}`,
+  },
 } as const;

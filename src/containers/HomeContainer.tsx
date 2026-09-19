@@ -1,12 +1,14 @@
-import { RefreshCw, MessageCircle } from "lucide-react";
+import { ArrowUpRight, RefreshCw, MessageCircle, Users } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { HomeHero } from "../components/home/HomeHero";
 import { RoomActions } from "../components/home/RoomActions";
 import { RoomList } from "../components/home/RoomList";
 import { LoadingState } from "../components/common/AsyncState";
+import { Badge } from "../components/common/Badge";
 import { Modal } from "../components/common/Modal";
 import { ChatPanel } from "../components/chat/ChatPanel";
+import type { BackendRoomStatus } from "../types/room";
 import { useMe } from "../hooks/use-me";
 import {
   hasOtherActiveRoom,
@@ -16,7 +18,22 @@ import {
   useMyRooms,
   useRooms,
 } from "../hooks/room/use-rooms";
+import { useGlobalChatHistory } from "../hooks/chat/use-chat-history";
+import { useGlobalChatSocket } from "../hooks/websocket/useGlobalChatSocket";
 import { getApiErrorMessage } from "../utils/get-api-error-message";
+
+const MY_ROOM_STATUS_LABEL: Record<BackendRoomStatus, string> = {
+  waiting: "대기 중",
+  countdown: "시작 준비",
+  in_progress: "진행 중",
+  finished: "종료",
+};
+
+// 참여 중인 방이 있을 때/없을 때 모두 이 클래스 하나를 그대로 쓴다 — 두 상태가
+// 서로 다른 카드로 각자 튜닝되어 높이/여백/radius가 미묘하게 어긋나는 일이
+// 없도록, "카드의 생김새"를 이 한 곳에서만 정의하고 내용만 갈아끼운다.
+const TOP_CARD_CLASS =
+  "flex min-h-[106px] flex-col justify-center rounded-2xl bg-gradient-to-br from-[#6c4cff] via-[#8065ff] to-[#ff78a7] px-6 py-4 text-white shadow-[0_16px_45px_rgba(108,76,255,0.25)]";
 
 export function HomeContainer() {
   const navigate = useNavigate();
@@ -29,6 +46,9 @@ export function HomeContainer() {
   const [pendingRoomId, setPendingRoomId] = useState<number>();
   const [joinError, setJoinError] = useState<string>();
   const [chatOpen, setChatOpen] = useState(false);
+  const globalChatQuery = useGlobalChatHistory(true);
+  const globalChatSocket = useGlobalChatSocket(chatOpen);
+  const [chatSendError, setChatSendError] = useState<string>();
   const joinedIds = new Set(myRoomsQuery.data?.map((room) => room.id));
   const hasActiveRoom = hasOtherActiveRoom(myRoomsQuery.data ?? []);
   const handleJoin = async (roomId: number) => {
@@ -48,58 +68,49 @@ export function HomeContainer() {
     void roomsQuery.refetch();
     void myRoomsQuery.refetch();
   };
+  const myRoom = myRoomsQuery.data?.[0];
   return (
     <>
-      <HomeHero nickname={meQuery.data?.user?.nickname ?? "플레이어"} />
-      <RoomActions
-        isCreating={createMutation.isPending}
-        isJoining={codeMutation.isPending}
-        hasActiveRoom={hasActiveRoom}
-        createError={
-          createMutation.error
-            ? getApiErrorMessage(createMutation.error, "방을 만들지 못했습니다.")
-            : undefined
-        }
-        joinError={
-          codeMutation.error
-            ? getApiErrorMessage(codeMutation.error, "초대 코드를 확인해주세요.")
-            : undefined
-        }
-        onReset={() => {
-          createMutation.reset();
-          codeMutation.reset();
-        }}
-        onCreate={async (request) => {
-          const response = await createMutation.mutateAsync(request);
-          navigate(`/rooms/${response.room.id}`);
-        }}
-        onJoin={async (code) => {
-          const response = await codeMutation.mutateAsync(code);
-          navigate(`/rooms/${response.roomId}`);
-        }}
-      />
-      {(myRoomsQuery.data?.length ?? 0) > 0 && (
-        <section className="px-5 pt-6" aria-labelledby="my-rooms-title">
-          <h2 id="my-rooms-title" className="text-sm font-black text-[#342953]">
-            참여 중인 방
-          </h2>
-          <div className="mt-2 flex gap-2 overflow-x-auto pb-2">
-            {myRoomsQuery.data?.map((room) => (
-              <Link
-                key={room.id}
-                to={
-                  room.status === "finished"
-                    ? `/rooms/${room.id}/result`
-                    : `/rooms/${room.id}`
-                }
-                className="max-w-56 shrink-0 truncate rounded-xl bg-[#eee9ff] px-3 py-3 text-xs font-bold text-[#6c4cff]"
-              >
-                {room.title} · {room.currentPlayers}/{room.maxPlayers}
-              </Link>
-            ))}
+      {/* 홈 상단 영역은 참여 중인 방이 있는지에 따라 안쪽 내용만 바뀌는, 하나의
+          고정된 카드 슬롯이다(TOP_CARD_CLASS) — 두 상태가 서로 다른 레이아웃이
+          되지 않도록 여기서 섹션/카드 껍데기를 한 번만 그리고, 아래 참여
+          가능한 게임방 섹션은 항상 같은 위치에서 시작한다. */}
+      <section
+        className="px-5 pb-4 pt-5"
+        aria-label={myRoom ? "참여 중인 방" : undefined}
+      >
+        {myRoom ? (
+          <Link
+            to={
+              myRoom.status === "finished"
+                ? `/rooms/${myRoom.id}/result`
+                : `/rooms/${myRoom.id}`
+            }
+            className={TOP_CARD_CLASS}
+          >
+            <div className="flex items-center justify-between gap-2">
+              <Badge tone="mint">{MY_ROOM_STATUS_LABEL[myRoom.status]}</Badge>
+              <span className="flex items-center gap-1 text-xs font-bold text-white/85">
+                <Users className="size-3.5" aria-hidden="true" />
+                {myRoom.currentPlayers} / {myRoom.maxPlayers}명
+              </span>
+            </div>
+            <div className="mt-2 flex items-center justify-between gap-2">
+              <p className="min-w-0 truncate text-xl font-black leading-tight tracking-[-0.03em]">
+                {myRoom.title}
+              </p>
+              <span className="inline-flex shrink-0 items-center gap-1 text-xs font-bold text-white/90">
+                돌아가기
+                <ArrowUpRight className="size-3.5" aria-hidden="true" />
+              </span>
+            </div>
+          </Link>
+        ) : (
+          <div className={TOP_CARD_CLASS}>
+            <HomeHero nickname={meQuery.data?.user?.nickname ?? "플레이어"} />
           </div>
-        </section>
-      )}
+        )}
+      </section>
       <section className="px-5 pb-6 pt-6" aria-labelledby="room-list-title">
         <div className="flex items-center justify-between gap-2">
           <h2 id="room-list-title" className="text-base font-black text-[#342953]">
@@ -156,18 +167,69 @@ export function HomeContainer() {
           />
         )}
       </section>
-      <div className="mt-auto px-5 pb-6">
-        <button
-          type="button"
-          onClick={() => setChatOpen(true)}
-          className="flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-[#ded8f2] text-sm text-[#8b85a8]"
-        >
-          <MessageCircle className="size-4" aria-hidden="true" />
-          메시지 · 준비 중
-        </button>
+      {/* 자주 쓰는 핵심 액션(방 만들기/참여/채팅)을 스크롤과 무관하게 항상 누를 수
+          있도록 화면 하단에 고정한다. sticky는 정상 흐름 안에서 자기 높이만큼
+          공간을 그대로 차지하므로, 위 목록 콘텐츠가 이 바에 가려지지 않는다. */}
+      <div className="sticky bottom-0 mt-auto border-t border-[#eeeaf8] bg-[#fbfaff] px-5 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
+        <div className="flex items-center gap-2">
+          <RoomActions
+            isCreating={createMutation.isPending}
+            isJoining={codeMutation.isPending}
+            hasActiveRoom={hasActiveRoom}
+            createError={
+              createMutation.error
+                ? getApiErrorMessage(createMutation.error, "방을 만들지 못했습니다.")
+                : undefined
+            }
+            joinError={
+              codeMutation.error
+                ? getApiErrorMessage(codeMutation.error, "초대 코드를 확인해주세요.")
+                : undefined
+            }
+            onReset={() => {
+              createMutation.reset();
+              codeMutation.reset();
+            }}
+            onCreate={async (request) => {
+              const response = await createMutation.mutateAsync(request);
+              navigate(`/rooms/${response.room.id}`);
+            }}
+            onJoin={async (code) => {
+              const response = await codeMutation.mutateAsync(code);
+              navigate(`/rooms/${response.roomId}`);
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => setChatOpen(true)}
+            aria-label="전체 채팅"
+            className="inline-flex min-h-12 shrink-0 items-center gap-1 whitespace-nowrap rounded-2xl border border-[#ded8f2] bg-white px-2.5 text-xs font-bold text-[#3d335c]"
+          >
+            <MessageCircle className="size-3.5 shrink-0" aria-hidden="true" />
+            채팅
+          </button>
+        </div>
       </div>
-      <Modal isOpen={chatOpen} onClose={() => setChatOpen(false)} title="메시지">
-        <ChatPanel />
+      <Modal isOpen={chatOpen} onClose={() => setChatOpen(false)} title="전체 채팅">
+        <ChatPanel
+          title="전체 채팅"
+          showTitle={false}
+          messages={globalChatQuery.data ?? []}
+          meUserId={meQuery.data?.user?.id}
+          isLoadingHistory={globalChatQuery.isPending}
+          onSend={async (content) => {
+            setChatSendError(undefined);
+            try {
+              await globalChatSocket.sendMessage(content);
+            } catch (error) {
+              setChatSendError(
+                getApiErrorMessage(error, "메시지를 보내지 못했습니다."),
+              );
+              throw error;
+            }
+          }}
+          sendError={chatSendError}
+        />
       </Modal>
     </>
   );
