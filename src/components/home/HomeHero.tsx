@@ -12,13 +12,13 @@ export function HomeHero({ nickname }: HomeHeroProps) {
           <Camera className="size-3.5 shrink-0" aria-hidden="true" />
           <span className="truncate">PICYOINK · 함께 이어 만드는 실시간 포토 릴레이</span>
         </div>
-        <h1 className="mt-3 text-2xl font-black leading-tight tracking-[-0.03em]">
+        <h1 className="mt-4 text-2xl font-black leading-tight tracking-[-0.03em]">
           {nickname}님,
           <br />
           어떤 사진을 이어볼까요?
         </h1>
-        <p className="mt-2 text-sm leading-6 text-white/75">
-          방을 만들거나 초대 코드로 친구의 릴레이에 참여하세요.
+        <p className="mt-3 text-sm leading-6 text-white/75">
+          친구와 함께 사진을 이어보세요.
         </p>
       </div>
     </section>

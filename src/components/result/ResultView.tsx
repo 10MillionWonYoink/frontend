@@ -1,4 +1,4 @@
-import { Home, Trophy } from "lucide-react";
+import { Home } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { Room } from "../../types/room";
 import type { GameResult } from "../../types/result";
@@ -9,20 +9,10 @@ import { RoundResultList } from "./RoundResultList";
 
 export function ResultView({ room, result }: { room: Room; result: GameResult }) {
   return (
-    <>
-      <header className="bg-gradient-to-br from-[#2d214d] via-[#5c42bc] to-[#a55be5] px-5 pb-4 pt-[max(1.25rem,env(safe-area-inset-top))] text-center text-white">
-        <span className="mx-auto grid size-10 place-items-center rounded-2xl bg-white/15">
-          <Trophy className="size-5 text-[#ffe275]" aria-hidden="true" />
-        </span>
-        <p className="mt-2 text-[11px] font-extrabold text-white/70">PHOTO RELAY</p>
-        <h1 className="mt-0.5 text-xl font-black">게임 결과</h1>
-        <p className="mt-1 break-words text-xs text-white/80">
-          {result.roomTitle ?? room.title}
-        </p>
-      </header>
-      <div className="-mt-2 flex-1 space-y-5 rounded-t-3xl bg-[#fbfaff] px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-5">
+    <div className="flex-1 space-y-5 bg-[#fbfaff] px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[max(1.25rem,env(safe-area-inset-top))]">
         <FinalRankingSection
           ranking={result.ranking}
+          turns={result.turns}
           evaluationComplete={result.evaluationComplete}
         />
         <RoundResultList
@@ -50,7 +40,6 @@ export function ResultView({ room, result }: { room: Room; result: GameResult })
             </Link>
           </div>
         </div>
-      </div>
-    </>
+    </div>
   );
 }

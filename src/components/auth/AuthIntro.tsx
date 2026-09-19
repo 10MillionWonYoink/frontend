@@ -8,7 +8,7 @@ export function AuthIntro() {
       </div>
       <div className="mt-6 inline-flex items-center gap-1.5 rounded-full bg-[#ebe5ff] px-3 py-1 text-xs font-extrabold text-[#6c4cff]">
         <Sparkles className="size-3.5" aria-hidden="true" />
-        AI PHOTO RELAY
+        AI PICYOINK
       </div>
       <h1 className="mt-4 text-3xl font-black tracking-[-0.04em] text-[#2c2345]">
         사진으로 이어지는

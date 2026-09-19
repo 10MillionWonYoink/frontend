@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <linearGradient id="picyoink-gradient" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6c4cff" />
+      <stop offset="1" stop-color="#ff78a7" />
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="8" fill="url(#picyoink-gradient)" />
+  <path
+    d="M10 12.5h1.6l1.1-1.7a1 1 0 0 1 .84-.46h5a1 1 0 0 1 .84.46l1.1 1.7H22a2 2 0 0 1 2 2V21a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-6.5a2 2 0 0 1 2-2Z"
+    fill="#ffffff"
+  />
+  <circle cx="16" cy="17.5" r="3.1" fill="url(#picyoink-gradient)" />
+</svg>

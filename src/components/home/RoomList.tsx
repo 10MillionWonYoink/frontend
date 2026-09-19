@@ -42,7 +42,7 @@ export function RoomList({
               type="button"
               onClick={() => onJoin(room.id)}
               disabled={disabled || (!isJoined && (!isAvailable || hasOtherActiveRoom))}
-              className="flex min-h-16 w-full items-center justify-between gap-3 rounded-2xl border border-[#e9e4f7] bg-white p-3.5 text-left transition hover:border-[#b9aaf8] disabled:opacity-60"
+              className="flex min-h-20 w-full items-center justify-between gap-3 rounded-2xl border border-[#e9e4f7] bg-white p-4 text-left transition hover:border-[#b9aaf8] disabled:opacity-60"
             >
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
@@ -51,7 +51,7 @@ export function RoomList({
                   </p>
                   {index === 0 && <Badge tone="pink">NEW</Badge>}
                 </div>
-                <div className="mt-1.5 flex items-center gap-2">
+                <div className="mt-2 flex items-center gap-2">
                   <Badge tone={isAvailable ? "mint" : "purple"}>
                     {getRoomStatusLabel(room.status)}
                   </Badge>
