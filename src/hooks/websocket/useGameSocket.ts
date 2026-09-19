@@ -11,9 +11,14 @@ import type { Acknowledgement, SubmitTurnResult } from "../../types/realtime";
 import type { GameSessionState } from "../../types/game";
 import { gameQueryKeys } from "../game/use-games";
 import { roomQueryKeys } from "../room/use-rooms";
+import { appendChatMessage, chatQueryKeys } from "../chat/use-chat-history";
 import type { RealtimeStatus } from "./useLobbySocket";
 
-export function useGameSocket(gameId: number | undefined, enabled: boolean) {
+export function useGameSocket(
+  gameId: number | undefined,
+  roomId: number | undefined,
+  enabled: boolean,
+) {
   const queryClient = useQueryClient();
   const socketRef = useRef<RealtimeSocket | null>(null);
   const subscribedRef = useRef(false);
@@ -182,6 +187,10 @@ export function useGameSocket(gameId: number | undefined, enabled: boolean) {
         remainingParticipants: event.remainingParticipants,
       });
     });
+    socket.on("chat:room:message", (message) => {
+      if (roomId && message.roomId === roomId)
+        appendChatMessage(queryClient, chatQueryKeys.room(roomId), message);
+    });
     socket.connect();
     return () => {
       active = false;
@@ -190,7 +199,7 @@ export function useGameSocket(gameId: number | undefined, enabled: boolean) {
       socket.removeAllListeners();
       socketRef.current = null;
     };
-  }, [enabled, gameId, queryClient]);
+  }, [enabled, gameId, roomId, queryClient]);
 
   const requireSocket = useCallback(() => {
     const socket = socketRef.current;
@@ -212,11 +221,25 @@ export function useGameSocket(gameId: number | undefined, enabled: boolean) {
     },
     [requireSocket, gameId],
   );
+  const sendRoomChat = useCallback(
+    async (content: string) => {
+      const socket = requireSocket();
+      if (!roomId) throw new Error("방 정보를 확인할 수 없습니다.");
+      return acknowledge(
+        socket,
+        (done: (result: Acknowledgement & { message: unknown }) => void) =>
+          socket.emit("chat:room:send", { roomId, content }, done),
+        "메시지를 전송하지 못했습니다. 잠시 후 다시 시도해주세요.",
+      );
+    },
+    [requireSocket, roomId],
+  );
 
   return {
     status: enabled ? status : "idle",
     error,
     playerLeftNotice,
     submitTurn,
+    sendRoomChat,
   };
 }

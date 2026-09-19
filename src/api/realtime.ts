@@ -32,6 +32,7 @@ export function socketErrorMessage(error: SocketFailure): string {
 export function acknowledge<T>(
   socket: RealtimeSocket,
   send: (done: (result: T) => void) => void,
+  timeoutMessage = "응답이 지연되고 있습니다. 현재 방 상태를 확인한 뒤 다시 시도해주세요.",
 ): Promise<T> {
   if (!socket.connected)
     return Promise.reject(new Error("실시간 연결을 확인해주세요."));
@@ -51,11 +52,7 @@ export function acknowledge<T>(
     };
     const timer = window.setTimeout(() => {
       cleanup();
-      reject(
-        new Error(
-          "응답이 지연되고 있습니다. 현재 방 상태를 확인한 뒤 다시 시도해주세요.",
-        ),
-      );
+      reject(new Error(timeoutMessage));
     }, 8_000);
     socket.once("exception", onException);
     socket.once("disconnect", onDisconnect);

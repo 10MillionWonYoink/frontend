@@ -4,6 +4,8 @@ import { ErrorState, LoadingState } from "../components/common/AsyncState";
 import { Button } from "../components/common/Button";
 import { RoomLobbyView } from "../components/room/RoomLobbyView";
 import { useRoomLobby } from "../hooks/room/use-room-lobby";
+import { useMe } from "../hooks/use-me";
+import { useRoomChatHistory } from "../hooks/chat/use-chat-history";
 import { getApiErrorMessage } from "../utils/get-api-error-message";
 import { isValidRoomId } from "../utils/is-valid-room-id";
 
@@ -11,6 +13,9 @@ export function RoomContainer() {
   const navigate = useNavigate();
   const { roomId = "" } = useParams();
   const lobby = useRoomLobby(roomId);
+  const meQuery = useMe();
+  const numericRoomId = isValidRoomId(roomId) ? Number(roomId) : undefined;
+  const chatHistoryQuery = useRoomChatHistory(numericRoomId, true);
   useEffect(() => {
     if (lobby.room?.status === "PLAYING" || lobby.room?.status === "READY")
       navigate(`/rooms/${roomId}/game`, { replace: true });
@@ -59,6 +64,14 @@ export function RoomContainer() {
       onUpdateRoom={lobby.updateRoom}
       onChangeHost={lobby.changeHost}
       onStartGame={lobby.startGame}
+      chat={{
+        messages: chatHistoryQuery.data ?? [],
+        meUserId: meQuery.data?.user?.id,
+        isLoadingHistory: chatHistoryQuery.isPending,
+        onSend: lobby.sendRoomChat,
+        isSending: lobby.isSendingRoomChat,
+        sendError: lobby.roomChatError,
+      }}
     />
   );
 }

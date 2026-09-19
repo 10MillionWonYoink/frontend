@@ -4,10 +4,21 @@ import type { Room, RoomPlayer } from "../../types/room";
 import type { RoomUpdate } from "../../types/realtime";
 import { Button } from "../common/Button";
 import { Card } from "../common/Card";
+import { ChatPanel } from "../chat/ChatPanel";
+import type { ChatMessage } from "../../types/chat";
 import { PlayerGrid } from "./PlayerGrid";
 import { RoomSettings } from "./RoomSettings";
 import { RoomManageControls } from "./RoomManageControls";
 import { useCopyToClipboard } from "../../hooks/use-copy-to-clipboard";
+
+export interface RoomChatProps {
+  messages: ChatMessage[];
+  meUserId?: number;
+  isLoadingHistory: boolean;
+  onSend: (content: string) => Promise<unknown>;
+  isSending: boolean;
+  sendError?: string;
+}
 
 interface RoomLobbyViewProps {
   currentPlayer: RoomPlayer | undefined;
@@ -21,6 +32,7 @@ interface RoomLobbyViewProps {
   onChangeHost: (userId: number) => Promise<unknown>;
   onStartGame: () => void;
   room: Room;
+  chat: RoomChatProps;
 }
 
 export function RoomLobbyView({
@@ -35,6 +47,7 @@ export function RoomLobbyView({
   onChangeHost,
   onStartGame,
   room,
+  chat,
 }: RoomLobbyViewProps) {
   const { isCopied, copyError, copy } = useCopyToClipboard(room.invitationCode);
   const canAct = socketStatus === "open" && room.status === "WAITING" && !isMutating;
@@ -140,6 +153,12 @@ export function RoomLobbyView({
             onChangeHost={onChangeHost}
           />
         )}
+        <ChatPanel title="방 채팅" {...chat} />
+      </div>
+      {/* 준비/게임 시작은 게임방에서 가장 중요한 액션이라, 채팅이 길어져도 항상
+          손닿는 곳에 있도록 화면 하단에 고정한다(채팅 입력창은 위 ChatPanel 내부에
+          그대로 남아있고, 여기서는 화면 전체 기준으로 fixed하지 않는다). */}
+      <div className="sticky bottom-0 border-t border-[#eeeaf8] bg-[#fbfaff] px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
         {room.status === "FINISHED" ? (
           <Link
             to={`/rooms/${room.id}/result`}

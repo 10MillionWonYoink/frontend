@@ -35,6 +35,7 @@ export function useRoomLobby(roomId: string) {
     mutationFn: socket.startGame,
     onSettled: refresh,
   });
+  const chatMutation = useMutation({ mutationFn: socket.sendRoomChat });
   const mutationError =
     readyMutation.error ??
     leaveMutation.error ??
@@ -63,5 +64,8 @@ export function useRoomLobby(roomId: string) {
     updateRoom: updateMutation.mutateAsync,
     changeHost: hostMutation.mutateAsync,
     startGame: startGameMutation.mutate,
+    sendRoomChat: chatMutation.mutateAsync,
+    isSendingRoomChat: chatMutation.isPending,
+    roomChatError: chatMutation.error?.message,
   };
 }
