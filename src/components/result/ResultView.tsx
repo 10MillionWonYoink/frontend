@@ -50,8 +50,7 @@ export function ResultView({
             to={`/rooms/${room.id}`}
             className="inline-flex min-h-12 items-center justify-center gap-1 rounded-2xl bg-[#6c4cff] text-sm font-bold text-white"
           >
-            <RotateCcw className="size-4" aria-hidden="true" />
-            한 번 더 하기
+            <RotateCcw className="size-4" aria-hidden="true" />한 번 더 하기
           </Link>
           <button
             type="button"

@@ -15,12 +15,16 @@ export function GameHistoryDetailContainer() {
   const resultQuery = useGameResultQuery(valid ? Number(gameId) : undefined);
 
   if (!valid) return <ErrorState message="게임 기록 주소가 올바르지 않습니다." />;
-  if (resultQuery.isPending) return <LoadingState message="게임 기록을 불러오고 있어요." />;
+  if (resultQuery.isPending)
+    return <LoadingState message="게임 기록을 불러오고 있어요." />;
 
   if (resultQuery.isError || !resultQuery.data)
     return (
       <ErrorState
-        message={getApiErrorMessage(resultQuery.error, "게임 기록을 불러오지 못했습니다.")}
+        message={getApiErrorMessage(
+          resultQuery.error,
+          "게임 기록을 불러오지 못했습니다.",
+        )}
         onRetry={() => void resultQuery.refetch()}
       />
     );

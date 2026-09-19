@@ -9,12 +9,16 @@ const PAGE_SIZE = 20;
 export function HistoryContainer() {
   const historyQuery = useMyGameHistory(PAGE_SIZE);
 
-  if (historyQuery.isPending) return <LoadingState message="게임 기록을 불러오고 있어요." />;
+  if (historyQuery.isPending)
+    return <LoadingState message="게임 기록을 불러오고 있어요." />;
 
   if (historyQuery.isError || !historyQuery.data)
     return (
       <ErrorState
-        message={getApiErrorMessage(historyQuery.error, "게임 기록을 불러오지 못했습니다.")}
+        message={getApiErrorMessage(
+          historyQuery.error,
+          "게임 기록을 불러오지 못했습니다.",
+        )}
         onRetry={() => void historyQuery.refetch()}
       />
     );
