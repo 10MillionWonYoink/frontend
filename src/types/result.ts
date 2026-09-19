@@ -35,3 +35,26 @@ export interface GameResult {
   ranking: GameRanking[];
   turns: GameResultTurn[];
 }
+
+export interface GameHistoryParticipant {
+  userId: number;
+  nickname: string;
+  profileImageUrl: string | null;
+}
+
+export interface GameHistoryItem {
+  gameId: number;
+  roomId: number;
+  roomTitle: string | null;
+  finishedAt: string;
+  participants: GameHistoryParticipant[];
+  myScore: number;
+  myRank: number;
+}
+
+export interface GameHistoryPage {
+  games: GameHistoryItem[];
+  total: number;
+  limit: number;
+  offset: number;
+}

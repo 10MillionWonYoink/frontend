@@ -4,6 +4,8 @@ import HomePage from "../pages/Home/HomePage";
 import GamePage from "../pages/Relay/GamePage";
 import RoomPage from "../pages/Relay/RoomPage";
 import ResultPage from "../pages/Result/ResultPage";
+import HistoryPage from "../pages/History/HistoryPage";
+import GameHistoryDetailPage from "../pages/History/GameHistoryDetailPage";
 import NotFoundPage from "../pages/NotFound/NotFoundPage";
 import App from "../App.tsx";
 import ErrorPage from "../pages/Error/ErrorPage.tsx";
@@ -27,6 +29,8 @@ export const router = createBrowserRouter([
           { path: "rooms/:roomId", element: <RoomPage /> },
           { path: "rooms/:roomId/game", element: <GamePage /> },
           { path: "rooms/:roomId/result", element: <ResultPage /> },
+          { path: "history", element: <HistoryPage /> },
+          { path: "games/:gameId/result", element: <GameHistoryDetailPage /> },
         ],
       },
 

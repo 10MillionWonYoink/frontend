@@ -315,6 +315,19 @@ export function RoundResultList({
                               : "AI가 평가하고 있어요..."}
                           </p>
                         )}
+
+                        {/* 아예 제출하지 않은 턴(시간 초과/진행 안 함): 0점과 혼동되지
+                            않도록, 점수/총평 영역 대신 명확한 미제출 안내로 채운다. */}
+                        {turn.status !== "submitted" && (
+                          <div className="mt-3 rounded-2xl bg-[#f4f2f9] px-3 py-3 text-center">
+                            <p className="text-sm font-extrabold text-[#8b85a8]">
+                              사진 미제출
+                            </p>
+                            <p className="mt-0.5 text-xs text-[#a89fc2]">
+                              평가할 사진이 없어요
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </li>
                   ))}

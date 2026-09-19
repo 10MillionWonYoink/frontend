@@ -18,5 +18,6 @@ export const endpoints = {
       `/games/rooms/${encodePathSegment(roomId)}/latest`,
     detail: (gameId: number) => `/games/${encodePathSegment(gameId)}`,
     result: (gameId: number) => `/games/${encodePathSegment(gameId)}/result`,
+    myHistory: "/games/my",
   },
 } as const;
