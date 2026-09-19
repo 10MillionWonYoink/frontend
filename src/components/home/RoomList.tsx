@@ -51,24 +51,24 @@ export function RoomList({
                   </p>
                   {index === 0 && <Badge tone="pink">NEW</Badge>}
                 </div>
-                <p className="mt-2 flex items-center gap-1 text-xs text-[#8b85a8]">
-                  <Users className="size-3.5" aria-hidden="true" />
-                  {room.currentPlayers} / {room.maxPlayers}명
-                </p>
+                <div className="mt-2 flex items-center gap-2">
+                  <Badge tone={isAvailable ? "mint" : "purple"}>
+                    {getRoomStatusLabel(room.status)}
+                  </Badge>
+                  <span className="flex items-center gap-1 text-xs text-[#8b85a8]">
+                    <Users className="size-3.5" aria-hidden="true" />
+                    {room.currentPlayers} / {room.maxPlayers}명
+                  </span>
+                </div>
               </div>
-              <div className="flex shrink-0 flex-col items-end gap-2">
-                <Badge tone={isAvailable ? "mint" : "purple"}>
-                  {getRoomStatusLabel(room.status)}
-                </Badge>
-                <span className="flex items-center gap-1 text-xs font-bold text-[#6c4cff]">
-                  {pendingRoomId === room.id
-                    ? "입장 중..."
-                    : isJoined
-                      ? "돌아가기"
-                      : "참여하기"}
-                  <ArrowUpRight className="size-3" aria-hidden="true" />
-                </span>
-              </div>
+              <span className="flex shrink-0 items-center gap-1 text-xs font-bold text-[#6c4cff]">
+                {pendingRoomId === room.id
+                  ? "입장 중..."
+                  : isJoined
+                    ? "돌아가기"
+                    : "참여하기"}
+                <ArrowUpRight className="size-3" aria-hidden="true" />
+              </span>
             </button>
           </li>
         );

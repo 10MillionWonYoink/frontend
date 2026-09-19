@@ -49,6 +49,10 @@ export function GameView({
   const remainingSeconds = useCountdown(initialSeconds, !currentTurn);
   const { previewUrl, selectedPhoto, selectPhoto } = usePhotoSelection();
   const uploadMutation = useUploadRoomPhoto();
+  // Uploading to S3 happens before the socket submit mutation even starts, so
+  // isSubmitting alone doesn't cover it — without this, the button stays
+  // clickable (and doesn't show "제출 중...") for the whole upload phase.
+  const isBusy = isSubmitting || uploadMutation.isPending;
 
   const handleSubmit = async () => {
     if (!selectedPhoto) {
@@ -121,29 +125,27 @@ export function GameView({
               <>
                 <CameraPreview
                   imageUrl={previewUrl}
-                  isDisabled={isSubmitting}
+                  isDisabled={isBusy}
                   onPhotoSelect={selectPhoto}
                 />
+                {uploadMutation.isError && (
+                  <p role="alert" className="text-sm text-[#d93f75]">
+                    {getApiErrorMessage(uploadMutation.error, "사진을 업로드하지 못했습니다.")}
+                  </p>
+                )}
                 {submitError ? (
                   <p role="alert" className="text-sm text-[#d93f75]">
                     {getApiErrorMessage(submitError, "사진을 제출하지 못했습니다.")}
                   </p>
                 ) : null}
                 <Button
-                  disabled={!selectedPhoto || isSubmitting || socketStatus !== "open"}
+                  disabled={!selectedPhoto || isBusy || socketStatus !== "open"}
                   fullWidth
                   onClick={() => void handleSubmit()}
                   className="min-h-14"
                 >
-                  {isSubmitting ? "제출 중..." : "사진 제출하기"}
+                  {isBusy ? "제출 중..." : "사진 제출하기"}
                 </Button>
-                {uploadMutation.isError && (
-                  <p>
-                    {uploadMutation.error instanceof Error
-                      ? uploadMutation.error.message
-                      : '사진 업로드에 실패했습니다.'}
-                  </p>
-                )}
               </>
             ) : (
               <div className="flex min-h-64 flex-col items-center justify-center rounded-[1.75rem] bg-[#21173b] text-white/70">

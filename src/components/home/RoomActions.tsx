@@ -64,18 +64,20 @@ export function RoomActions({
   };
   return (
     <section className="px-5" aria-label="게임방 만들기와 참여">
-      <div className="grid grid-cols-2 gap-3">
+      <div className="flex flex-col gap-3">
         <Button
           onClick={() => open("create")}
           disabled={hasActiveRoom}
-          className="gap-1 whitespace-nowrap px-2 text-sm"
+          fullWidth
+          className="min-h-14 gap-1.5 text-base"
         >
-          <Plus className="size-4" aria-hidden="true" />새 게임방
+          <Plus className="size-5" aria-hidden="true" />새 게임방
         </Button>
         <Button
           onClick={() => open("join")}
           variant="secondary"
-          className="gap-1 whitespace-nowrap px-2 text-sm"
+          fullWidth
+          className="gap-1.5 text-sm"
         >
           <TicketCheck className="size-4" aria-hidden="true" />
           초대 코드 참여

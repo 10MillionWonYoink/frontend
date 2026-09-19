@@ -8,7 +8,7 @@ interface AppHeaderProps {
 
 export function AppHeader({ actionLabel, onAction }: AppHeaderProps) {
   return (
-    <header className="flex items-center justify-between px-5 pb-3 pt-[max(1rem,env(safe-area-inset-top))]">
+    <header className="flex items-center justify-between px-5 pb-4 pt-[max(1.25rem,env(safe-area-inset-top))]">
       <Link
         to="/"
         className="flex items-center gap-2 text-sm font-black text-[#342953]"
@@ -16,7 +16,7 @@ export function AppHeader({ actionLabel, onAction }: AppHeaderProps) {
         <span className="grid size-8 place-items-center rounded-xl bg-[#6c4cff] text-white">
           <Camera className="size-4" aria-hidden="true" />
         </span>
-        PHOTO RELAY
+        PICYOINK
       </Link>
       {actionLabel && onAction && (
         <button
