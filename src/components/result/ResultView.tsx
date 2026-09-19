@@ -13,6 +13,8 @@ export function ResultView({ room, result }: { room: Room; result: GameResult })
         <FinalRankingSection
           ranking={result.ranking}
           turns={result.turns}
+          totalTurns={result.totalTurns}
+          totalRounds={room.totalRounds}
           evaluationComplete={result.evaluationComplete}
         />
         <RoundResultList
