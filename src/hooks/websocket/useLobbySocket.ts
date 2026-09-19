@@ -17,6 +17,7 @@ import type {
 } from "../../types/realtime";
 import type { Room } from "../../types/room";
 import { roomQueryKeys } from "../room/use-rooms";
+import { appendChatMessage, chatQueryKeys } from "../chat/use-chat-history";
 
 export type RealtimeStatus = "idle" | "connecting" | "open" | "closed" | "error";
 
@@ -145,6 +146,10 @@ export function useLobbySocket(roomId: number, enabled: boolean) {
     socket.on("lobby:game-started", (payload) => {
       if (payload.roomId === roomId) refreshRoom();
     });
+    socket.on("chat:room:message", (message) => {
+      if (message.roomId === roomId)
+        appendChatMessage(queryClient, chatQueryKeys.room(roomId), message);
+    });
     socket.connect();
     return () => {
       active = false;
@@ -216,12 +221,25 @@ export function useLobbySocket(roomId: number, enabled: boolean) {
     setError(null);
     socket.connect();
   }, []);
+  const sendRoomChat = useCallback(
+    async (content: string) => {
+      const socket = requireSocket();
+      return acknowledge(
+        socket,
+        (done: (result: Acknowledgement & { message: unknown }) => void) =>
+          socket.emit("chat:room:send", { roomId, content }, done),
+        "메시지를 전송하지 못했습니다. 잠시 후 다시 시도해주세요.",
+      );
+    },
+    [requireSocket, roomId],
+  );
 
   return {
     status: enabled ? status : "idle",
     error,
     roomClosed,
     setReady,
+    sendRoomChat,
     leave,
     updateRoom,
     changeHost,

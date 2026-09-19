@@ -16,6 +16,8 @@ import {
   useMyRooms,
   useRooms,
 } from "../hooks/room/use-rooms";
+import { useGlobalChatHistory } from "../hooks/chat/use-chat-history";
+import { useGlobalChatSocket } from "../hooks/websocket/useGlobalChatSocket";
 import { getApiErrorMessage } from "../utils/get-api-error-message";
 
 export function HomeContainer() {
@@ -29,6 +31,9 @@ export function HomeContainer() {
   const [pendingRoomId, setPendingRoomId] = useState<number>();
   const [joinError, setJoinError] = useState<string>();
   const [chatOpen, setChatOpen] = useState(false);
+  const globalChatQuery = useGlobalChatHistory(true);
+  const globalChatSocket = useGlobalChatSocket(chatOpen);
+  const [chatSendError, setChatSendError] = useState<string>();
   const joinedIds = new Set(myRoomsQuery.data?.map((room) => room.id));
   const hasActiveRoom = hasOtherActiveRoom(myRoomsQuery.data ?? []);
   const handleJoin = async (roomId: number) => {
@@ -160,14 +165,30 @@ export function HomeContainer() {
         <button
           type="button"
           onClick={() => setChatOpen(true)}
-          className="flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-[#ded8f2] text-sm text-[#8b85a8]"
+          className="flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border border-[#ded8f2] bg-white text-sm font-bold text-[#3d335c]"
         >
           <MessageCircle className="size-4" aria-hidden="true" />
-          메시지 · 준비 중
+          전체 채팅
         </button>
       </div>
-      <Modal isOpen={chatOpen} onClose={() => setChatOpen(false)} title="메시지">
-        <ChatPanel />
+      <Modal isOpen={chatOpen} onClose={() => setChatOpen(false)} title="전체 채팅">
+        <ChatPanel
+          title="전체 채팅"
+          showTitle={false}
+          messages={globalChatQuery.data ?? []}
+          meUserId={meQuery.data?.user?.id}
+          isLoadingHistory={globalChatQuery.isPending}
+          onSend={async (content) => {
+            setChatSendError(undefined);
+            try {
+              await globalChatSocket.sendMessage(content);
+            } catch (error) {
+              setChatSendError(getApiErrorMessage(error, "메시지를 보내지 못했습니다."));
+              throw error;
+            }
+          }}
+          sendError={chatSendError}
+        />
       </Modal>
     </>
   );
