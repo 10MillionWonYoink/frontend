@@ -72,8 +72,7 @@ export function useGlobalChatSocket(enabled: boolean) {
 
   const sendMessage = useCallback(async (content: string) => {
     const socket = socketRef.current;
-    if (!socket?.connected)
-      throw new Error("채팅 연결 후 다시 시도해주세요.");
+    if (!socket?.connected) throw new Error("채팅 연결 후 다시 시도해주세요.");
     return acknowledge(
       socket,
       (done: (result: Acknowledgement & { message: unknown }) => void) =>

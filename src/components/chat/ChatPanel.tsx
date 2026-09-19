@@ -89,7 +89,9 @@ export function ChatPanel({
       {showTitle && (
         <h2
           className={
-            compact ? "text-xs font-black text-[#342953]" : "text-sm font-black text-[#342953]"
+            compact
+              ? "text-xs font-black text-[#342953]"
+              : "text-sm font-black text-[#342953]"
           }
         >
           {title}
@@ -127,7 +129,9 @@ export function ChatPanel({
                       />
                     )}
                     <div className={`min-w-0 ${isMine ? "text-right" : ""}`}>
-                      <p className="text-xs font-bold">{isMine ? "나" : message.nickname}</p>
+                      <p className="text-xs font-bold">
+                        {isMine ? "나" : message.nickname}
+                      </p>
                       <p
                         className={`mt-1 whitespace-pre-wrap break-words rounded-xl bg-white text-left text-sm ${compact ? "px-2.5 py-1.5" : "p-3"}`}
                       >
@@ -151,10 +155,15 @@ export function ChatPanel({
             ) : (
               <div className="flex min-h-16 flex-col items-center justify-center text-center text-[#8b85a8]">
                 {!compact && (
-                  <MessageCircle className="mb-3 size-8 text-[#b9aaf8]" aria-hidden="true" />
+                  <MessageCircle
+                    className="mb-3 size-8 text-[#b9aaf8]"
+                    aria-hidden="true"
+                  />
                 )}
                 <h3 className="text-sm font-bold">아직 메시지가 없어요</h3>
-                {!compact && <p className="mt-2 text-xs leading-5">첫 메시지를 남겨보세요.</p>}
+                {!compact && (
+                  <p className="mt-2 text-xs leading-5">첫 메시지를 남겨보세요.</p>
+                )}
               </div>
             )}
           </div>
