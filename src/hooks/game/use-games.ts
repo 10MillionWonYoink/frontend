@@ -17,7 +17,10 @@ export function useLatestGameByRoom(roomId: string | undefined) {
   });
 }
 
-export function useGameSessionQuery(gameId: number | undefined, meUserId: number | undefined) {
+export function useGameSessionQuery(
+  gameId: number | undefined,
+  meUserId: number | undefined,
+) {
   return useQuery({
     queryKey: gameQueryKeys.detail(gameId ?? 0),
     queryFn: () => getGameSession(gameId as number),

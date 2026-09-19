@@ -13,10 +13,7 @@ interface ImagePreviewModalProps {
   onClose: () => void;
 }
 
-export function ImagePreviewModal({
-                                    image,
-                                    onClose,
-                                  }: ImagePreviewModalProps) {
+export function ImagePreviewModal({ image, onClose }: ImagePreviewModalProps) {
   useEffect(() => {
     if (!image) {
       return;
@@ -74,8 +71,7 @@ export function ImagePreviewModal({
         />
 
         {image.caption && (
-          <p
-            className="mt-3 max-w-xl truncate rounded-full bg-black/40 px-4 py-2 text-center text-sm font-bold text-white">
+          <p className="mt-3 max-w-xl truncate rounded-full bg-black/40 px-4 py-2 text-center text-sm font-bold text-white">
             {image.caption}
           </p>
         )}

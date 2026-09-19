@@ -141,8 +141,8 @@ export function HomeContainer() {
         )}
         {hasActiveRoom && (
           <p className="mb-3 text-[11px] text-[#8b85a8]">
-            이미 참여 중인 방이 있어요. 그 방에서 나가면 새 방을 만들거나 다른 방에 참여할 수
-            있어요.
+            이미 참여 중인 방이 있어요. 그 방에서 나가면 새 방을 만들거나 다른 방에
+            참여할 수 있어요.
           </p>
         )}
         {roomsQuery.data && (

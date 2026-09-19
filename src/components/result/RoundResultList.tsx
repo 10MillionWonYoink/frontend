@@ -84,21 +84,18 @@ interface RoundResultListProps {
 }
 
 export function RoundResultList({
-                                  turns,
-                                  totalTurns,
-                                  totalRounds,
-                                  evaluationComplete,
-                                }: RoundResultListProps) {
+  turns,
+  totalTurns,
+  totalRounds,
+  evaluationComplete,
+}: RoundResultListProps) {
   const groups = groupTurnsByRound(turns, totalTurns, totalRounds);
   const [previewImage, setPreviewImage] = useState<PreviewImage | null>(null);
 
   return (
     <>
       <section aria-labelledby="result-photos">
-        <h2
-          id="result-photos"
-          className="text-base font-black text-[#342953]"
-        >
+        <h2 id="result-photos" className="text-base font-black text-[#342953]">
           우리의 사진 릴레이
         </h2>
 
@@ -138,8 +135,7 @@ export function RoundResultList({
                   </span>
                 </summary>
 
-                <ul
-                  className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <ul className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                   {group.turns.map((turn) => (
                     <li
                       key={turn.turnNumber}
@@ -175,31 +171,27 @@ export function RoundResultList({
                             className="relative z-10 size-full object-contain transition-transform duration-300 group-hover/image:scale-[1.03]"
                           />
 
-                          <span
-                            className="absolute left-3 top-3 z-20 rounded-full bg-black/55 px-3 py-1.5 text-xs font-black text-white backdrop-blur-sm">
-                          TURN {turn.turnNumber}
-                        </span>
+                          <span className="absolute left-3 top-3 z-20 rounded-full bg-black/55 px-3 py-1.5 text-xs font-black text-white backdrop-blur-sm">
+                            TURN {turn.turnNumber}
+                          </span>
 
                           {turn.score !== null && (
-                            <span
-                              className="absolute right-3 top-3 z-20 rounded-full bg-[#6c4cff]/90 px-3 py-1.5 text-xs font-black text-white shadow-sm backdrop-blur-sm">
-                            {turn.score}점
-                          </span>
+                            <span className="absolute right-3 top-3 z-20 rounded-full bg-[#6c4cff]/90 px-3 py-1.5 text-xs font-black text-white shadow-sm backdrop-blur-sm">
+                              {turn.score}점
+                            </span>
                           )}
 
                           {/* 마우스를 올렸을 때 크게 보기 안내 */}
-                          <span
-                            className="absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black/70 to-transparent px-4 pb-3 pt-10 text-center text-xs font-bold text-white opacity-0 transition-opacity group-hover/image:opacity-100">
-                          클릭해서 크게 보기
-                        </span>
+                          <span className="absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black/70 to-transparent px-4 pb-3 pt-10 text-center text-xs font-bold text-white opacity-0 transition-opacity group-hover/image:opacity-100">
+                            클릭해서 크게 보기
+                          </span>
                         </button>
                       ) : (
                         // 기존 사진 없음 UI
                         <div className="relative grid aspect-[4/3] place-items-center bg-[#f5f2fb]">
-                        <span
-                          className="absolute left-3 top-3 rounded-full bg-[#ded8ec] px-3 py-1.5 text-xs font-black text-[#756e8d]">
-                          TURN {turn.turnNumber}
-                        </span>
+                          <span className="absolute left-3 top-3 rounded-full bg-[#ded8ec] px-3 py-1.5 text-xs font-black text-[#756e8d]">
+                            TURN {turn.turnNumber}
+                          </span>
 
                           <p className="text-sm font-extrabold text-[#8b85a8]">
                             제출된 사진이 없습니다
@@ -224,12 +216,12 @@ export function RoundResultList({
                             <p className="text-[11px] text-[#8b85a8]">
                               {turn.submittedAt
                                 ? new Date(turn.submittedAt).toLocaleTimeString(
-                                  "ko-KR",
-                                  {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                  },
-                                )
+                                    "ko-KR",
+                                    {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    },
+                                  )
                                 : "제출 시간 없음"}
                             </p>
                           </div>
@@ -251,62 +243,63 @@ export function RoundResultList({
                           </div>
                         )}
 
-                        {turn.score !== null && (() => {
-                          const { summary, breakdown } = turn.feedback
-                            ? parseAiFeedback(turn.feedback)
-                            : { summary: "", breakdown: null };
+                        {turn.score !== null &&
+                          (() => {
+                            const { summary, breakdown } = turn.feedback
+                              ? parseAiFeedback(turn.feedback)
+                              : { summary: "", breakdown: null };
 
-                          return (
-                            <div className="mt-3 rounded-2xl bg-[#f4f2f9] px-3 py-3">
-                              {/* 총점 */}
-                              <p className="text-[10px] font-extrabold text-[#8b85a8]">
-                                총점
-                              </p>
-                              <p className="mt-0.5">
-                                <span className="text-2xl font-black text-[#6c4cff]">
-                                  {turn.score}
-                                </span>
-                                <span className="text-sm font-bold text-[#8b85a8]">
-                                  {" "}
-                                  / 100점
-                                </span>
-                              </p>
+                            return (
+                              <div className="mt-3 rounded-2xl bg-[#f4f2f9] px-3 py-3">
+                                {/* 총점 */}
+                                <p className="text-[10px] font-extrabold text-[#8b85a8]">
+                                  총점
+                                </p>
+                                <p className="mt-0.5">
+                                  <span className="text-2xl font-black text-[#6c4cff]">
+                                    {turn.score}
+                                  </span>
+                                  <span className="text-sm font-bold text-[#8b85a8]">
+                                    {" "}
+                                    / 100점
+                                  </span>
+                                </p>
 
-                              {/* 총평 */}
-                              {summary && (
-                                <div className="mt-2.5 border-t border-[#e5e1ee] pt-2.5">
-                                  <p className="text-[10px] font-extrabold text-[#8b85a8]">
-                                    총평
-                                  </p>
-                                  <p className="mt-0.5 whitespace-pre-line text-xs leading-5 text-[#625b79]">
-                                    {summary}
-                                  </p>
-                                </div>
-                              )}
+                                {/* 총평 */}
+                                {summary && (
+                                  <div className="mt-2.5 border-t border-[#e5e1ee] pt-2.5">
+                                    <p className="text-[10px] font-extrabold text-[#8b85a8]">
+                                      총평
+                                    </p>
+                                    <p className="mt-0.5 whitespace-pre-line text-xs leading-5 text-[#625b79]">
+                                      {summary}
+                                    </p>
+                                  </div>
+                                )}
 
-                              {/* 세부 평가 */}
-                              {breakdown && (
-                                <div className="mt-2.5 grid grid-cols-3 gap-2 border-t border-[#e5e1ee] pt-2.5">
-                                  <ScoreDetail
-                                    label="주제 적합성"
-                                    value={breakdown.relevance}
-                                    max={50}
-                                  />
-                                  <ScoreDetail
-                                    label="표현력"
-                                    value={breakdown.expression}
-                                    max={30}
-                                  />
-                                  <ScoreDetail
-                                    label="창의성"
-                                    value={breakdown.creativity}
-                                    max={20}
-                                  />
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })()}
+                                {/* 세부 평가 */}
+                                {breakdown && (
+                                  <div className="mt-2.5 grid grid-cols-3 gap-2 border-t border-[#e5e1ee] pt-2.5">
+                                    <ScoreDetail
+                                      label="주제 적합성"
+                                      value={breakdown.relevance}
+                                      max={50}
+                                    />
+                                    <ScoreDetail
+                                      label="표현력"
+                                      value={breakdown.expression}
+                                      max={30}
+                                    />
+                                    <ScoreDetail
+                                      label="창의성"
+                                      value={breakdown.creativity}
+                                      max={20}
+                                    />
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })()}
 
                         {/* 제출은 했지만 아직 점수가 없는 경우: 미제출과 혼동되지 않도록
                             "평가 중"과 "평가 실패"를 구분해서 보여준다. 게임 전체 평가가
@@ -332,10 +325,7 @@ export function RoundResultList({
         </div>
       </section>
 
-      <ImagePreviewModal
-        image={previewImage}
-        onClose={() => setPreviewImage(null)}
-      />
+      <ImagePreviewModal image={previewImage} onClose={() => setPreviewImage(null)} />
     </>
   );
 }

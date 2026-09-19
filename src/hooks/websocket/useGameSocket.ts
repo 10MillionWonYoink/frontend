@@ -175,8 +175,8 @@ export function useGameSocket(gameId: number | undefined, enabled: boolean) {
         gameQueryKeys.detail(gameId),
       );
       const nickname =
-        current?.turns.find((turn) => turn.userId === event.leftUserId)
-          ?.nickname ?? "상대방";
+        current?.turns.find((turn) => turn.userId === event.leftUserId)?.nickname ??
+        "상대방";
       setPlayerLeftNotice({
         nickname,
         remainingParticipants: event.remainingParticipants,
