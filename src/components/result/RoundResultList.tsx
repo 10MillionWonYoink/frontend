@@ -1,3 +1,4 @@
+import { ChevronDown } from "lucide-react";
 import type { GameResultTurn } from "../../types/result";
 import { Avatar } from "../common/Avatar";
 import { Badge } from "../common/Badge";
@@ -15,6 +16,38 @@ function turnBadgeTone(status: GameResultTurn["status"]): "mint" | "pink" | "pur
   if (status === "submitted") return "mint";
   if (status === "expired") return "pink";
   return "purple";
+}
+
+interface ScoreBreakdown {
+  relevance: number;
+  expression: number;
+  creativity: number;
+}
+
+// Backend's aiFeedback packs the 세부 점수 into the tail of the sentence, e.g.
+// "표현이 좋아요 (주제 적합성 14/50, 표현력 9/30, 창의성 6/20)". No separate API field
+// exists for these, so this pulls them back out for display without touching the
+// feedback text's own storage/shape. Falls back to showing the raw text untouched
+// if it doesn't match (e.g. older data), rather than hiding or guessing at it.
+const SCORE_BREAKDOWN_PATTERN =
+  /\s*\(주제 적합성 (\d+)\/50, 표현력 (\d+)\/30, 창의성 (\d+)\/20\)\s*$/;
+
+function parseAiFeedback(feedback: string): {
+  summary: string;
+  breakdown: ScoreBreakdown | null;
+} {
+  const match = feedback.match(SCORE_BREAKDOWN_PATTERN);
+
+  if (!match) return { summary: feedback, breakdown: null };
+
+  return {
+    summary: feedback.slice(0, match.index).trim(),
+    breakdown: {
+      relevance: Number(match[1]),
+      expression: Number(match[2]),
+      creativity: Number(match[3]),
+    },
+  };
 }
 
 interface RoundGroup {
@@ -47,12 +80,14 @@ interface RoundResultListProps {
   turns: GameResultTurn[];
   totalTurns: number;
   totalRounds: number;
+  evaluationComplete: boolean;
 }
 
 export function RoundResultList({
                                   turns,
                                   totalTurns,
                                   totalRounds,
+                                  evaluationComplete,
                                 }: RoundResultListProps) {
   const groups = groupTurnsByRound(turns, totalTurns, totalRounds);
   const [previewImage, setPreviewImage] = useState<PreviewImage | null>(null);
@@ -74,12 +109,13 @@ export function RoundResultList({
             ).length;
 
             return (
-              <section
+              <details
                 key={group.round}
-                aria-labelledby={`round-${group.round}`}
+                className="group/round"
+                open={group.round === 1}
               >
-                {/* 라운드 제목 */}
-                <header className="mb-3 flex items-center justify-between">
+                {/* 라운드 제목 (클릭해서 개별 접기/펼치기, 여러 라운드 동시에 펼침 가능) */}
+                <summary className="mb-3 flex cursor-pointer list-none items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <span className="h-5 w-1 rounded-full bg-[#6c4cff]" />
 
@@ -91,10 +127,16 @@ export function RoundResultList({
                     </h3>
                   </div>
 
-                  <span className="rounded-full bg-[#eee9ff] px-2.5 py-1 text-[11px] font-bold text-[#6c4cff]">
-              제출 {submittedCount}/{group.turns.length}
-            </span>
-                </header>
+                  <span className="flex items-center gap-2">
+                    <span className="rounded-full bg-[#eee9ff] px-2.5 py-1 text-[11px] font-bold text-[#6c4cff]">
+                      제출 {submittedCount}/{group.turns.length}
+                    </span>
+                    <ChevronDown
+                      className="size-4 text-[#8b85a8] transition-transform group-open/round:rotate-180"
+                      aria-hidden="true"
+                    />
+                  </span>
+                </summary>
 
                 <ul
                   className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -209,22 +251,82 @@ export function RoundResultList({
                           </div>
                         )}
 
-                        {turn.feedback && (
-                          <div className="mt-2 rounded-2xl bg-[#f4f2f9] px-3 py-2.5">
-                            <p className="text-[10px] font-extrabold text-[#8b85a8]">
-                              AI 평가
-                            </p>
+                        {turn.score !== null && (() => {
+                          const { summary, breakdown } = turn.feedback
+                            ? parseAiFeedback(turn.feedback)
+                            : { summary: "", breakdown: null };
 
-                            <p className="mt-1 whitespace-pre-line text-xs leading-5 text-[#625b79]">
-                              {turn.feedback}
-                            </p>
-                          </div>
+                          return (
+                            <div className="mt-3 rounded-2xl bg-[#f4f2f9] px-3 py-3">
+                              {/* 총점 */}
+                              <p className="text-[10px] font-extrabold text-[#8b85a8]">
+                                총점
+                              </p>
+                              <p className="mt-0.5">
+                                <span className="text-2xl font-black text-[#6c4cff]">
+                                  {turn.score}
+                                </span>
+                                <span className="text-sm font-bold text-[#8b85a8]">
+                                  {" "}
+                                  / 100점
+                                </span>
+                              </p>
+
+                              {/* 총평 */}
+                              {summary && (
+                                <div className="mt-2.5 border-t border-[#e5e1ee] pt-2.5">
+                                  <p className="text-[10px] font-extrabold text-[#8b85a8]">
+                                    총평
+                                  </p>
+                                  <p className="mt-0.5 whitespace-pre-line text-xs leading-5 text-[#625b79]">
+                                    {summary}
+                                  </p>
+                                </div>
+                              )}
+
+                              {/* 세부 평가 */}
+                              {breakdown && (
+                                <div className="mt-2.5 grid grid-cols-3 gap-2 border-t border-[#e5e1ee] pt-2.5">
+                                  <ScoreDetail
+                                    label="주제 적합성"
+                                    value={breakdown.relevance}
+                                    max={50}
+                                  />
+                                  <ScoreDetail
+                                    label="표현력"
+                                    value={breakdown.expression}
+                                    max={30}
+                                  />
+                                  <ScoreDetail
+                                    label="창의성"
+                                    value={breakdown.creativity}
+                                    max={20}
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
+
+                        {/* 제출은 했지만 아직 점수가 없는 경우: 미제출과 혼동되지 않도록
+                            "평가 중"과 "평가 실패"를 구분해서 보여준다. 게임 전체 평가가
+                            끝나기 전까지는 순서를 기다리는 중일 수 있으므로 실패로 단정하지 않는다. */}
+                        {turn.status === "submitted" && turn.score === null && (
+                          <p
+                            className={`mt-2 text-xs font-bold ${
+                              evaluationComplete ? "text-[#d93f75]" : "text-[#8b85a8]"
+                            }`}
+                          >
+                            {evaluationComplete
+                              ? "AI 평가에 실패했어요"
+                              : "AI가 평가하고 있어요..."}
+                          </p>
                         )}
                       </div>
                     </li>
                   ))}
                 </ul>
-              </section>
+              </details>
             );
           })}
         </div>
@@ -235,5 +337,25 @@ export function RoundResultList({
         onClose={() => setPreviewImage(null)}
       />
     </>
+  );
+}
+
+function ScoreDetail({
+  label,
+  value,
+  max,
+}: {
+  label: string;
+  value: number;
+  max: number;
+}) {
+  return (
+    <div className="rounded-xl bg-white px-2 py-2 text-center">
+      <p className="text-[9px] font-extrabold text-[#8b85a8]">{label}</p>
+      <p className="mt-0.5 text-sm font-black text-[#342953]">
+        {value}
+        <span className="text-[10px] font-bold text-[#8b85a8]">/{max}</span>
+      </p>
+    </div>
   );
 }

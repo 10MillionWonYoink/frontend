@@ -59,13 +59,21 @@ export async function uploadRoomImage({
     );
 
   // 발급받은 URL로 S3에 직접 업로드
-  const uploadResponse = await fetch(data.uploadUrl, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': file.type,
-    },
-    body: file,
-  });
+  let uploadResponse: Response;
+
+  try {
+    uploadResponse = await fetch(data.uploadUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': file.type,
+      },
+      body: file,
+    });
+  } catch {
+    // fetch() 자체가 실패하면(네트워크 끊김, CORS 등) 브라우저가 던지는 원문 메시지가
+    // "Failed to fetch"처럼 사용자에게 의미 없는 문구라 그대로 노출하지 않는다.
+    throw new Error('네트워크 연결을 확인하고 다시 시도해주세요.');
+  }
 
   if (!uploadResponse.ok) {
     throw new Error(

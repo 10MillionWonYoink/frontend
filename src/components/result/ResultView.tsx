@@ -5,7 +5,6 @@ import type { GameResult } from "../../types/result";
 import { PlayerGrid } from "../room/PlayerGrid";
 import { RoomSettings } from "../room/RoomSettings";
 import { FinalRankingSection } from "./FinalRankingSection";
-import { GameTopicSection } from "./GameTopicSection";
 import { RoundResultList } from "./RoundResultList";
 
 export function ResultView({ room, result }: { room: Room; result: GameResult }) {
@@ -22,7 +21,6 @@ export function ResultView({ room, result }: { room: Room; result: GameResult })
         </p>
       </header>
       <div className="-mt-3 flex-1 space-y-5 rounded-t-3xl bg-[#fbfaff] px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-6">
-        <GameTopicSection topic={result.topic} />
         <FinalRankingSection
           ranking={result.ranking}
           evaluationComplete={result.evaluationComplete}
@@ -31,6 +29,7 @@ export function ResultView({ room, result }: { room: Room; result: GameResult })
           turns={result.turns}
           totalTurns={result.totalTurns}
           totalRounds={room.totalRounds}
+          evaluationComplete={result.evaluationComplete}
         />
         <PlayerGrid players={room.players} title="현재 방 참여자" />
         <RoomSettings room={room} />

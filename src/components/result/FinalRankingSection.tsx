@@ -30,11 +30,11 @@ export function FinalRankingSection({
           {ranking.map((entry) => (
             <li
               key={entry.userId}
-              className="flex items-center gap-3 rounded-2xl border border-[#e9e4f7] bg-white p-3"
+              className="flex items-center gap-3 rounded-2xl border border-[#e9e4f7] bg-white p-4"
             >
-              <span className="grid size-7 shrink-0 place-items-center text-sm font-black text-[#6c4cff]">
+              <span className="grid size-9 shrink-0 place-items-center text-base font-black text-[#6c4cff]">
                 {entry.rank <= 3 ? (
-                  <Medal className="size-5" aria-label={`${entry.rank}위`} />
+                  <Medal className="size-6" aria-label={`${entry.rank}위`} />
                 ) : (
                   entry.rank
                 )}
@@ -42,9 +42,17 @@ export function FinalRankingSection({
               <p className="min-w-0 flex-1 truncate text-sm font-extrabold text-[#342953]">
                 {entry.nickname}
               </p>
-              <strong className="text-lg font-black text-[#6c4cff]">
-                {entry.totalScore}
-              </strong>
+              <div className="shrink-0 text-right">
+                <p>
+                  <span className="text-2xl font-black text-[#6c4cff]">
+                    {entry.totalScore}
+                  </span>
+                  <span className="text-sm font-bold text-[#8b85a8]"> / 100점</span>
+                </p>
+                <p className="text-[10px] font-bold text-[#8b85a8]">
+                  제출 사진 평균 점수
+                </p>
+              </div>
             </li>
           ))}
         </ul>
