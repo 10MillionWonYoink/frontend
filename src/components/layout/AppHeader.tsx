@@ -1,4 +1,4 @@
-import { Camera, LogOut } from "lucide-react";
+import { Camera, History, LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface AppHeaderProps {
@@ -18,16 +18,25 @@ export function AppHeader({ actionLabel, onAction }: AppHeaderProps) {
         </span>
         PICYOINK
       </Link>
-      {actionLabel && onAction && (
-        <button
-          type="button"
-          onClick={onAction}
+      <div className="flex items-center gap-1">
+        <Link
+          to="/history"
           className="inline-flex min-h-10 items-center gap-1 rounded-xl px-2 text-xs font-bold text-[#8b85a8]"
         >
-          <LogOut className="size-4" aria-hidden="true" />
-          {actionLabel}
-        </button>
-      )}
+          <History className="size-4" aria-hidden="true" />
+          기록
+        </Link>
+        {actionLabel && onAction && (
+          <button
+            type="button"
+            onClick={onAction}
+            className="inline-flex min-h-10 items-center gap-1 rounded-xl px-2 text-xs font-bold text-[#8b85a8]"
+          >
+            <LogOut className="size-4" aria-hidden="true" />
+            {actionLabel}
+          </button>
+        )}
+      </div>
     </header>
   );
 }
