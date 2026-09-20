@@ -1,6 +1,5 @@
 import { Camera } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useMemo } from "react";
 import type { Room } from "../../types/room";
 import type { GameSessionState } from "../../types/game";
 import { Badge } from "../common/Badge";
@@ -45,12 +44,7 @@ export function GameView({
   const isMyTurn = Boolean(
     currentTurn && meUserId !== undefined && currentTurn.userId === meUserId,
   );
-  const expiresAt = currentTurn?.expiresAt;
-  const initialSeconds = useMemo(() => {
-    if (!expiresAt) return 0;
-    return Math.max(0, Math.round((new Date(expiresAt).getTime() - Date.now()) / 1000));
-  }, [expiresAt]);
-  const remainingSeconds = useCountdown(initialSeconds, !currentTurn);
+  const remainingSeconds = useCountdown(currentTurn?.expiresAt, !currentTurn);
   const { previewUrl, selectedPhoto, selectPhoto } = usePhotoSelection();
   const uploadMutation = useUploadRoomPhoto();
   // Uploading to S3 happens before the socket submit mutation even starts, so
