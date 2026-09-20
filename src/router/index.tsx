@@ -1,13 +1,48 @@
-import { createBrowserRouter } from "react-router-dom";
-
+import { InviteJoinContainer } from "../containers/InviteJoinContainer";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import HomePage from "../pages/Home/HomePage";
-import RelayPage from "../pages/Relay/RelayPage";
+import GamePage from "../pages/Relay/GamePage";
+import RoomPage from "../pages/Relay/RoomPage";
 import ResultPage from "../pages/Result/ResultPage";
+import HistoryPage from "../pages/History/HistoryPage";
+import GameHistoryDetailPage from "../pages/History/GameHistoryDetailPage";
 import NotFoundPage from "../pages/NotFound/NotFoundPage";
+import App from "../App.tsx";
+import ErrorPage from "../pages/Error/ErrorPage.tsx";
+import SignInPage from "../pages/Auth/SignInPage.tsx";
+import SignUpPage from "../pages/Auth/SignUpPage.tsx";
+import { ProtectedRoute } from "./ProtectedRoute.tsx";
+import PublicOnlyRoute from "./PublicOnlyRoute.tsx";
 
 export const router = createBrowserRouter([
-  { path: "/", element: <HomePage /> },
-  { path: "/relay", element: <RelayPage /> },
-  { path: "/result", element: <ResultPage /> },
-  { path: "*", element: <NotFoundPage /> },
+  {
+    path: "/",
+    element: <App />,
+    children: [
+      {
+        element: <ProtectedRoute />,
+        children: [
+          { index: true, element: <HomePage /> },
+          { path: "relay", element: <Navigate to="/" replace /> },
+          { path: "result", element: <Navigate to="/" replace /> },
+          { path: "rooms/join/:inviteCode", element: <InviteJoinContainer /> },
+          { path: "rooms/:roomId", element: <RoomPage /> },
+          { path: "rooms/:roomId/game", element: <GamePage /> },
+          { path: "rooms/:roomId/result", element: <ResultPage /> },
+          { path: "history", element: <HistoryPage /> },
+          { path: "games/:gameId/result", element: <GameHistoryDetailPage /> },
+        ],
+      },
+
+      {
+        element: <PublicOnlyRoute />,
+        children: [
+          { path: "signin", element: <SignInPage /> },
+          { path: "signup", element: <SignUpPage /> },
+        ],
+      },
+      { path: "error", element: <ErrorPage /> },
+      { path: "*", element: <NotFoundPage /> },
+    ],
+  },
 ]);

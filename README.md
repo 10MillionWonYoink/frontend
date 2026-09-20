@@ -32,7 +32,22 @@ pnpm preview
 
 ```env
 VITE_API_BASE_URL=http://localhost:3000
+VITE_WS_BASE_URL=ws://localhost:3000
 ```
+
+개발 모드에서 `VITE_API_BASE_URL`을 생략하면 `http://localhost:3000`을 사용합니다.
+배포 빌드에서 생략하면 현재 frontend origin의 `/api`를 사용합니다.
+
+카카오 OAuth callback은 backend가 처리합니다. 로컬 backend 환경에는 아래 값이 서로
+일치하도록 설정되어야 합니다.
+
+```env
+FRONTEND_URL=http://localhost:5173
+KAKAO_REDIRECT_URI=http://localhost:3000/api/auth/kakao/callback
+```
+
+Kakao Developers에도 동일한 `KAKAO_REDIRECT_URI`를 등록해야 합니다. 로그인 완료 후
+backend가 기존 회원은 `/`, 신규 회원은 `/signup`으로 이동시킵니다.
 
 운영 값은 GitHub Actions 환경에서 주입합니다.
 
@@ -50,7 +65,7 @@ src/
 └── utils/        # Utilities
 ```
 
-현재 백엔드 Swagger에는 사진 릴레이 API가 확정되어 있지 않으므로 `src/api/relay.ts`의 endpoint는 실제 명세가 나오면 교체합니다.
+백엔드 endpoint는 `src/api/endpoints.ts`에서 도메인별로 관리합니다. 실제 backend-test DTO 또는 URL이 달라지면 이 파일과 `src/types`의 타입을 함께 맞춰주세요.
 
 ## CI/CD
 

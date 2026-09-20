@@ -1,3 +1,10 @@
+import { Outlet } from "react-router-dom";
+import { MobileShell } from "./components/layout/MobileShell.tsx";
+
 export default function App() {
-  return null;
+  return (
+    <MobileShell>
+      <Outlet />
+    </MobileShell>
+  );
 }
