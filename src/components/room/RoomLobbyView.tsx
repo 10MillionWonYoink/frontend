@@ -184,9 +184,9 @@ export function RoomLobbyView({
                   fullWidth
                   disabled={!canStartGame}
                   onClick={onStartGame}
-                  className="min-h-14 gap-2"
+                  className="min-h-14 gap-1 whitespace-nowrap px-2"
                 >
-                  <Rocket className="size-5" aria-hidden="true" />
+                  <Rocket className="size-4 shrink-0" aria-hidden="true" />
                   {isMutating ? "처리 중..." : "게임 시작하기"}
                 </Button>
               ) : (
