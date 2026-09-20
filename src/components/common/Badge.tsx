@@ -17,7 +17,7 @@ const toneClassNames: Record<BadgeTone, string> = {
 export function Badge({ children, tone = "purple" }: BadgeProps) {
   return (
     <span
-      className={`inline-flex w-fit items-center rounded-full px-3 py-1 text-[11px] font-extrabold ${toneClassNames[tone]}`}
+      className={`inline-flex w-fit shrink-0 items-center whitespace-nowrap rounded-full px-3 py-1 text-[11px] font-extrabold ${toneClassNames[tone]}`}
     >
       {children}
     </span>
